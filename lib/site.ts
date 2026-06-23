@@ -3,7 +3,7 @@ export const siteConfig = {
   title: 'Aces Vanilla+ RCE',
   logo: '/aces-logo.png',
   description:
-    'Official store for Aces Vanilla+ — VIP kits, ranks, and perks for our Rust Console server.',
+    'Official store for Aces Vanilla+ -- Thank you for supporting the community!',
   tagline: 'Rust Console Store',
   heroFallback:
     'Support Aces Vanilla+ on console and unlock VIP kits, priority queue, and exclusive in-game perks.',
