@@ -13,8 +13,7 @@ function isStaticAsset(pathname: string) {
 
 function isShareMetadataPath(pathname: string) {
   return (
-    pathname === '/opengraph-image' ||
-    pathname.startsWith('/opengraph-image/') ||
+    pathname === '/aces-logo.png' ||
     pathname === '/twitter-image' ||
     pathname.startsWith('/twitter-image/')
   );

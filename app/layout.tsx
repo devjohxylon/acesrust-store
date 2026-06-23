@@ -25,11 +25,20 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     url: config.app.siteUrl,
     type: 'website',
+    images: [
+      {
+        url: siteConfig.logo,
+        width: 1024,
+        height: 1024,
+        alt: shareMetadata.title,
+      },
+    ],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: shareMetadata.title,
     description: shareMetadata.description,
+    images: [siteConfig.logo],
   },
   icons: {
     icon: siteConfig.logo,
