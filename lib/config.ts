@@ -9,5 +9,6 @@ export const config = {
   features: {
     handleCustomerIdentification:
       (process.env.HANDLE_CUSTOMER_IDENTIFICATION || 'false').toLowerCase() === 'true',
+    maintenanceMode: process.env.MAINTENANCE_MODE === 'true',
   },
 } as const;
