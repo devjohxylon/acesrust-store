@@ -1,5 +1,7 @@
 export const siteConfig = {
   name: 'Aces Vanilla+',
+  title: 'Aces Vanilla+ RCE',
+  logo: '/aces-logo.png',
   description:
     'Official store for Aces Vanilla+ — VIP kits, ranks, and perks for our Rust Console server.',
   tagline: 'Rust Console Store',

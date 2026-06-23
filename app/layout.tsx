@@ -14,8 +14,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} — ${siteConfig.tagline}`,
+  title: siteConfig.title,
   description: siteConfig.description,
+  icons: {
+    icon: siteConfig.logo,
+    apple: siteConfig.logo,
+  },
 };
 
 export default async function RootLayout({

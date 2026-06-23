@@ -16,7 +16,7 @@ function hasValidBypass(request: NextRequest) {
   return request.cookies.get('maintenance_bypass')?.value === BYPASS_SECRET;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (!MAINTENANCE_MODE) {
     return NextResponse.next();
   }

@@ -16,20 +16,13 @@ export function Footer({ initialStore }: FooterProps) {
   const currentYear = new Date().getFullYear();
   const discordUrl = store?.social_medias?.discord;
 
-  const stripHtml = (html: string) => {
-    return html.replace(/<[^>]*>/g, '').trim();
-  };
-
   return (
     <footer className="border-t border-border bg-card mt-auto">
       <div className="container mx-auto px-4 py-5">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div className="min-w-0 md:max-w-sm">
+          <div className="min-w-0">
             <p className="text-sm font-semibold text-white">
               {store?.title || siteConfig.name}
-            </p>
-            <p className="text-xs text-muted mt-1 leading-relaxed">
-              {store?.description ? stripHtml(store.description) : siteConfig.description}
             </p>
           </div>
 

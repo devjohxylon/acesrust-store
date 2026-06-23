@@ -50,21 +50,15 @@ export function Header({ initialStore }: HeaderProps) {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            {store?.logo ? (
-              <div className="relative w-10 h-10 rounded-lg overflow-hidden group-hover:scale-105 transition-transform">
-                <Image
-                  src={store.logo}
-                  alt={store.title || 'Store'}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
-            ) : (
-              <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center text-2xl font-bold text-white">
-                {store?.title?.[0] || 'D'}
-              </div>
-            )}
+            <div className="relative w-10 h-10 rounded-lg overflow-hidden group-hover:scale-105 transition-transform">
+              <Image
+                src={siteConfig.logo}
+                alt={store?.title || siteConfig.name}
+                fill
+                className="object-contain"
+                unoptimized
+              />
+            </div>
             <span className="text-xl font-bold text-white">
               {store?.title || siteConfig.name}
             </span>
