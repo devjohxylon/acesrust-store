@@ -1,9 +1,9 @@
 import { ImageResponse } from 'next/og';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { siteConfig } from '@/lib/site';
+import { shareMetadata } from '@/lib/share-metadata';
 
-export const alt = siteConfig.title;
+export const alt = shareMetadata.title;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -48,7 +48,7 @@ export default async function Image() {
               letterSpacing: '-0.02em',
             }}
           >
-            {siteConfig.title}
+            {shareMetadata.title}
           </div>
           <div
             style={{
@@ -60,7 +60,7 @@ export default async function Image() {
               lineHeight: 1.4,
             }}
           >
-            {siteConfig.description}
+            {shareMetadata.description}
           </div>
         </div>
       </div>

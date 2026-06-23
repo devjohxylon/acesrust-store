@@ -1,5 +1,15 @@
 import { siteConfig } from '@/lib/site';
+import { shareMetadata } from '@/lib/share-metadata';
 import { Wrench } from 'lucide-react';
+
+export const metadata = {
+  title: shareMetadata.title,
+  description: shareMetadata.description,
+  openGraph: {
+    title: shareMetadata.title,
+    description: shareMetadata.description,
+  },
+};
 
 const maintenanceMessage =
   process.env.MAINTENANCE_MESSAGE ||

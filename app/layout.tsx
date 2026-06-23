@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/footer";
 import { Tip4ServScript } from "@/components/providers/tip4serv-script";
 import { getStoreWhoami } from "@/lib/api-client";
 import { siteConfig } from "@/lib/site";
+import { shareMetadata } from "@/lib/share-metadata";
 import { config } from "@/lib/config";
 
 const inter = Inter({
@@ -16,18 +17,19 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(config.app.siteUrl),
-  title: siteConfig.title,
-  description: siteConfig.description,
+  title: shareMetadata.title,
+  description: shareMetadata.description,
   openGraph: {
-    title: siteConfig.title,
-    description: siteConfig.description,
+    title: shareMetadata.title,
+    description: shareMetadata.description,
     siteName: siteConfig.name,
+    url: config.app.siteUrl,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: siteConfig.title,
-    description: siteConfig.description,
+    title: shareMetadata.title,
+    description: shareMetadata.description,
   },
   icons: {
     icon: siteConfig.logo,

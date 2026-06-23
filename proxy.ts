@@ -11,6 +11,21 @@ function isStaticAsset(pathname: string) {
   );
 }
 
+function isShareMetadataPath(pathname: string) {
+  return (
+    pathname === '/opengraph-image' ||
+    pathname.startsWith('/opengraph-image/') ||
+    pathname === '/twitter-image' ||
+    pathname.startsWith('/twitter-image/')
+  );
+}
+
+function isSocialCrawler(userAgent: string) {
+  return /discordbot|facebookexternalhit|twitterbot|slackbot|linkedinbot|whatsapp|telegrambot/i.test(
+    userAgent
+  );
+}
+
 function hasValidBypass(request: NextRequest) {
   if (!BYPASS_SECRET) return false;
   return request.cookies.get('maintenance_bypass')?.value === BYPASS_SECRET;
@@ -22,8 +37,13 @@ export function proxy(request: NextRequest) {
   }
 
   const { pathname, searchParams } = request.nextUrl;
+  const userAgent = request.headers.get('user-agent') ?? '';
 
-  if (isStaticAsset(pathname)) {
+  if (isStaticAsset(pathname) || isShareMetadataPath(pathname)) {
+    return NextResponse.next();
+  }
+
+  if (isSocialCrawler(userAgent)) {
     return NextResponse.next();
   }
 

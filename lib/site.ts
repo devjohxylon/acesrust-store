@@ -1,9 +1,10 @@
+import { shareMetadata } from '@/lib/share-metadata';
+
 export const siteConfig = {
   name: 'Aces Vanilla+',
-  title: 'Aces Vanilla+ RCE',
+  title: shareMetadata.title,
   logo: '/aces-logo.png',
-  description:
-    'Official store for Aces Vanilla+ -- Thank you for supporting the community!',
+  description: shareMetadata.description,
   tagline: 'Rust Console Store',
   heroFallback:
     'Support Aces Vanilla+ on console and unlock VIP kits, priority queue, and exclusive in-game perks.',
