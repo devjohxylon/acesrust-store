@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --background: #08080c;
+  --foreground: #f5f5f7;
+  --primary: #ff1744;
+  --secondary: #ff4569;
+  --accent: #ff003c;
+  --card: #12080c;
+  --border: #2a1018;
+  --muted: #9ca3af;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+.glow-primary {
+  box-shadow: 0 0 20px rgba(255, 23, 68, 0.45), 0 0 40px rgba(255, 23, 68, 0.15);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 20px rgba(255, 69, 105, 0.35);
+}
+
+.glow-accent {
+  box-shadow: 0 0 20px rgba(255, 0, 60, 0.35);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.gradient-card {
+  background: linear-gradient(135deg, rgba(255, 23, 68, 0.1) 0%, rgba(255, 0, 60, 0.05) 100%);
+}
+
+.grid-pattern {
+  background-image:
+    linear-gradient(rgba(255, 23, 68, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 23, 68, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.tip4serv-overlay-logo {
+  margin-left: auto;
+  margin-right: auto;
+}
