@@ -59,6 +59,16 @@ export async function fetchFromTip4Serv(
   });
 }
 
+export async function readTip4ServError(response: Response): Promise<string> {
+  try {
+    const data = await response.json();
+    if (typeof data?.error === 'string') return data.error;
+    return response.statusText || 'Request failed';
+  } catch {
+    return response.statusText || 'Request failed';
+  }
+}
+
 // Server-side function to fetch store whoami with caching
 export async function getStoreWhoami(): Promise<Store | null> {
   try {

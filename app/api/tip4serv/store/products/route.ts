@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchFromTip4Serv, apiCache } from '@/lib/api-client';
+import { fetchFromTip4Serv, apiCache, readTip4ServError } from '@/lib/api-client';
 import { ProductsResponseSchema } from '@/lib/schemas';
 
 export async function GET(request: NextRequest) {
@@ -25,8 +25,14 @@ export async function GET(request: NextRequest) {
     const response = await fetchFromTip4Serv(`/store/products?${queryParams}`);
     
     if (!response.ok) {
+      const message = await readTip4ServError(response);
       return NextResponse.json(
-        { error: 'Failed to fetch products' },
+        {
+          error:
+            response.status === 403
+              ? 'Tip4Serv API key missing read-products permission. Regenerate your key at tip4serv.com/dashboard/api-keys with read-products enabled.'
+              : `Failed to fetch products: ${message}`,
+        },
         { status: response.status }
       );
     }

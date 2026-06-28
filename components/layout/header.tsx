@@ -84,6 +84,15 @@ export function Header({ initialStore }: HeaderProps) {
                 Shop
               </Link>
             )}
+            {isActive('/leaderboard') ? (
+              <span className="text-sm text-white font-semibold cursor-default">
+                Leaderboard
+              </span>
+            ) : (
+              <Link href="/leaderboard" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
+                Leaderboard
+              </Link>
+            )}
             {store?.menu_links?.map((menuLink, index) => (
               <a
                 key={index}
@@ -145,6 +154,13 @@ export function Header({ initialStore }: HeaderProps) {
               onClick={() => setMobileMenuOpen(false)}
             >
               Shop
+            </Link>
+            <Link 
+              href="/leaderboard" 
+              className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Leaderboard
             </Link>
             {store?.menu_links?.map((menuLink, index) => (
               <a

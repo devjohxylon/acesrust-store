@@ -33,6 +33,9 @@ export function Footer({ initialStore }: FooterProps) {
             <Link href="/shop" className="text-muted hover:text-foreground transition-colors">
               Shop
             </Link>
+            <Link href="/leaderboard" className="text-muted hover:text-foreground transition-colors">
+              Leaderboard
+            </Link>
             <Link href="/cart" className="text-muted hover:text-foreground transition-colors">
               Cart
             </Link>

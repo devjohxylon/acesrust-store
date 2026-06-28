@@ -5,9 +5,6 @@ export const siteConfig = {
   title: shareMetadata.title,
   logo: '/aces-logo.png',
   description: shareMetadata.description,
-  tagline: 'Rust Console Store',
   heroFallback:
-    'Support Aces Vanilla+ on console and unlock VIP kits, priority queue, and exclusive in-game perks.',
-  ctaFallback:
-    'Browse kits and ranks built for our vanilla+ Rust Console experience.',
+    'Support Aces Vanilla+ and unlock a VIP Kit & Priority Queue.',
 } as const;
