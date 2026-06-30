@@ -11,8 +11,10 @@ export type LeaderboardData = {
   topKillers: LeaderboardEntry[];
   topSurvivors: LeaderboardEntry[];
   topVictims: LeaderboardEntry[];
-  /** KAOS leaderboard screenshot synced from Discord */
+  /** KAOS leaderboard screenshot synced from Discord (public fallback URL, e.g. local dev) */
   kaosImageUrl?: string | null;
+  /** Blob pathname of the private KAOS screenshot, served via /api/leaderboard/image */
+  kaosImagePathname?: string | null;
   discordMessageId?: string | null;
 };
 

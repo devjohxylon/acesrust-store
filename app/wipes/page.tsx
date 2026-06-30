@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   description: 'Upcoming map, blueprint, and full wipes for Aces Vanilla+.',
 };
 
+export const revalidate = 60;
+
 function formatWipeDate(iso: string) {
   return new Intl.DateTimeFormat('en-US', {
     weekday: 'long',

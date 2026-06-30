@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: 'Top killers, survivors, and victims on Aces Vanilla+ Rust Console.',
 };
 
+export const revalidate = 60;
+
 export default async function LeaderboardPage() {
   const data = await getLeaderboard();
 

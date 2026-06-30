@@ -7,6 +7,8 @@ import { LeaderboardSection } from '@/components/leaderboard/leaderboard-section
 import { WipesSection } from '@/components/wipes/wipes-section';
 import { siteConfig } from '@/lib/site';
 
+export const revalidate = 60;
+
 async function HomePage() {
   const store = await getStoreWhoami();
 

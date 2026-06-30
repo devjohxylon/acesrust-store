@@ -58,6 +58,10 @@ function LeaderboardTable({
 }
 
 export function LeaderboardBoard({ data }: LeaderboardBoardProps) {
+  const kaosImageSrc = data.kaosImagePathname
+    ? `/api/leaderboard/image?v=${encodeURIComponent(data.updatedAt)}`
+    : data.kaosImageUrl ?? null;
+
   return (
     <div className="rounded-xl border border-border bg-[#1a1a1a] overflow-hidden shadow-2xl">
       <div className="px-4 sm:px-6 py-4 border-b border-white/10 bg-black/30">
@@ -73,11 +77,11 @@ export function LeaderboardBoard({ data }: LeaderboardBoardProps) {
       </div>
 
       <div className="p-4 sm:p-6">
-        {data.kaosImageUrl ? (
+        {kaosImageSrc ? (
           <div className="space-y-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={data.kaosImageUrl}
+              src={kaosImageSrc}
               alt={`${data.serverName} leaderboard`}
               className="w-full h-auto rounded-lg border border-white/10"
             />

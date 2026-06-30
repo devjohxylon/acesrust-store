@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { list, put } from '@vercel/blob';
+import { get, put } from '@vercel/blob';
 import { placeholderLeaderboard, type LeaderboardData } from '@/lib/leaderboard-data';
 import type { WipeSchedule } from '@/lib/cms-types';
 import { getCmsBackend } from '@/lib/cms-config';
@@ -24,18 +24,19 @@ const dataFile = path.join(process.cwd(), '.data', 'cms.json');
 let memoryData: CmsData | null = null;
 
 async function blobRead(): Promise<CmsData | null> {
-  const { blobs } = await list({ prefix: BLOB_PATHNAME, limit: 1 });
-  const found = blobs.find((blob) => blob.pathname === BLOB_PATHNAME);
-  if (!found) return null;
-
-  const res = await fetch(found.url, { cache: 'no-store' });
-  if (!res.ok) return null;
-  return (await res.json()) as CmsData;
+  try {
+    const result = await get(BLOB_PATHNAME, { access: 'private' });
+    if (!result || result.statusCode !== 200 || !result.stream) return null;
+    const text = await new Response(result.stream).text();
+    return JSON.parse(text) as CmsData;
+  } catch {
+    return null;
+  }
 }
 
 async function blobWrite(data: CmsData): Promise<void> {
   await put(BLOB_PATHNAME, JSON.stringify(data), {
-    access: 'public',
+    access: 'private',
     contentType: 'application/json',
     addRandomSuffix: false,
     allowOverwrite: true,

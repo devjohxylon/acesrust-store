@@ -22,9 +22,15 @@ function resolveImageUrl(payload: DiscordIngestPayload) {
   return payload.primaryImageUrl ?? payload.images?.[0]?.url ?? null;
 }
 
-async function persistKaosImage(remoteUrl: string) {
+type PersistedImage = {
+  pathname: string | null;
+  url: string | null;
+};
+
+async function persistKaosImage(remoteUrl: string): Promise<PersistedImage> {
+  // No Blob store (e.g. local dev) — fall back to the public Discord CDN URL.
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return remoteUrl;
+    return { pathname: null, url: remoteUrl };
   }
 
   const imageRes = await fetch(remoteUrl, { cache: 'no-store' });
@@ -35,15 +41,16 @@ async function persistKaosImage(remoteUrl: string) {
   const contentType = imageRes.headers.get('content-type') ?? 'image/png';
   const extension = contentType.includes('jpeg') ? 'jpg' : 'png';
   const imageBuffer = await imageRes.arrayBuffer();
+  const pathname = `leaderboard/kaos-latest.${extension}`;
 
-  const blob = await put(`leaderboard/kaos-latest.${extension}`, imageBuffer, {
-    access: 'public',
+  await put(pathname, imageBuffer, {
+    access: 'private',
     contentType,
     addRandomSuffix: false,
     allowOverwrite: true,
   });
 
-  return blob.url;
+  return { pathname, url: null };
 }
 
 export async function syncLeaderboardFromDiscord(
@@ -54,12 +61,13 @@ export async function syncLeaderboardFromDiscord(
     throw new Error('No leaderboard image in Discord payload');
   }
 
-  const kaosImageUrl = await persistKaosImage(remoteImageUrl);
+  const image = await persistKaosImage(remoteImageUrl);
   const data = await readCmsData();
 
   data.leaderboard = {
     ...data.leaderboard,
-    kaosImageUrl,
+    kaosImagePathname: image.pathname,
+    kaosImageUrl: image.url,
     discordMessageId: payload.messageId ?? null,
     updatedAt: formatUpdatedAt(payload.timestamp ?? new Date().toISOString()),
   };
