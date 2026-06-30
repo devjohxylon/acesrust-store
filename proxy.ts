@@ -25,6 +25,10 @@ function isSocialCrawler(userAgent: string) {
   );
 }
 
+function isAdminOrAuthPath(pathname: string) {
+  return pathname.startsWith('/admin') || pathname.startsWith('/api/admin');
+}
+
 function hasValidBypass(request: NextRequest) {
   if (!BYPASS_SECRET) return false;
   return request.cookies.get('maintenance_bypass')?.value === BYPASS_SECRET;
@@ -63,6 +67,10 @@ export function proxy(request: NextRequest) {
       path: '/',
     });
     return response;
+  }
+
+  if (isAdminOrAuthPath(pathname)) {
+    return NextResponse.next();
   }
 
   if (hasValidBypass(request)) {

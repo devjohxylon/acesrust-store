@@ -11,6 +11,9 @@ export type LeaderboardData = {
   topKillers: LeaderboardEntry[];
   topSurvivors: LeaderboardEntry[];
   topVictims: LeaderboardEntry[];
+  /** KAOS leaderboard screenshot synced from Discord */
+  kaosImageUrl?: string | null;
+  discordMessageId?: string | null;
 };
 
 /** Placeholder data — replace with live KAOS feed when available */

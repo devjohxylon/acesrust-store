@@ -1,13 +1,15 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { LeaderboardBoard } from '@/components/leaderboard/leaderboard-board';
-import { placeholderLeaderboard } from '@/lib/leaderboard-data';
+import { getLeaderboard } from '@/lib/cms-service';
 
 type LeaderboardSectionProps = {
   showViewAll?: boolean;
 };
 
-export function LeaderboardSection({ showViewAll = true }: LeaderboardSectionProps) {
+export async function LeaderboardSection({ showViewAll = true }: LeaderboardSectionProps) {
+  const data = await getLeaderboard();
+
   return (
     <section className="py-16 md:py-20 relative">
       <div className="absolute inset-0 grid-pattern opacity-15" />
@@ -22,7 +24,7 @@ export function LeaderboardSection({ showViewAll = true }: LeaderboardSectionPro
             </p>
           </div>
 
-          <LeaderboardBoard data={placeholderLeaderboard} />
+          <LeaderboardBoard data={data} />
 
           {showViewAll && (
             <div className="mt-8 text-center">

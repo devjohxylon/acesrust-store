@@ -93,6 +93,15 @@ export function Header({ initialStore }: HeaderProps) {
                 Leaderboard
               </Link>
             )}
+            {isActive('/wipes') ? (
+              <span className="text-sm text-white font-semibold cursor-default">
+                Wipes
+              </span>
+            ) : (
+              <Link href="/wipes" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
+                Wipes
+              </Link>
+            )}
             {store?.menu_links?.map((menuLink, index) => (
               <a
                 key={index}
@@ -161,6 +170,13 @@ export function Header({ initialStore }: HeaderProps) {
               onClick={() => setMobileMenuOpen(false)}
             >
               Leaderboard
+            </Link>
+            <Link 
+              href="/wipes" 
+              className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Wipes
             </Link>
             {store?.menu_links?.map((menuLink, index) => (
               <a

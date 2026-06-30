@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getStoreWhoami } from '@/lib/api-client';
 import { ProductsGrid } from '@/components/home/products-grid';
 import { LeaderboardSection } from '@/components/leaderboard/leaderboard-section';
+import { WipesSection } from '@/components/wipes/wipes-section';
 import { siteConfig } from '@/lib/site';
 
 async function HomePage() {
@@ -49,6 +50,8 @@ async function HomePage() {
       <ProductsGrid />
 
       <LeaderboardSection showViewAll={false} />
+
+      <WipesSection showViewAll={false} />
 
       {/* CTA Section */}
       <section className="py-20 relative">

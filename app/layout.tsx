@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
+import { SiteChrome } from "@/components/layout/site-chrome";
 import { Tip4ServScript } from "@/components/providers/tip4serv-script";
 import { getStoreWhoami } from "@/lib/api-client";
 import { siteConfig } from "@/lib/site";
@@ -63,11 +62,7 @@ export default async function RootLayout({
         <QueryProvider>
           <Tip4ServScript />
           <div className="min-h-screen flex flex-col">
-            <Header initialStore={initialStore} />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer initialStore={initialStore} />
+            <SiteChrome initialStore={initialStore}>{children}</SiteChrome>
           </div>
         </QueryProvider>
       </body>

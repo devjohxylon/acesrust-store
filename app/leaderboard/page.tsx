@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { LeaderboardBoard } from '@/components/leaderboard/leaderboard-board';
-import { placeholderLeaderboard } from '@/lib/leaderboard-data';
+import { getLeaderboard } from '@/lib/cms-service';
 import { siteConfig } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -8,7 +8,9 @@ export const metadata: Metadata = {
   description: 'Top killers, survivors, and victims on Aces Vanilla+ Rust Console.',
 };
 
-export default function LeaderboardPage() {
+export default async function LeaderboardPage() {
+  const data = await getLeaderboard();
+
   return (
     <div className="min-h-screen py-12 md:py-16">
       <div className="absolute inset-0 grid-pattern opacity-15 pointer-events-none" />
@@ -19,15 +21,11 @@ export default function LeaderboardPage() {
               Leaderboard
             </h1>
             <p className="text-muted">
-              Live stats from {placeholderLeaderboard.serverName}
+              Live stats from {data.serverName}
             </p>
           </div>
 
-          <LeaderboardBoard data={placeholderLeaderboard} />
-
-          <p className="mt-6 text-center text-xs text-muted">
-            Placeholder data — will connect to KAOS stats when available.
-          </p>
+          <LeaderboardBoard data={data} />
         </div>
       </div>
     </div>

@@ -73,30 +73,44 @@ export function LeaderboardBoard({ data }: LeaderboardBoardProps) {
       </div>
 
       <div className="p-4 sm:p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
-          <LeaderboardTable
-            title="TOP KILLERS"
-            titleClass="text-primary"
-            headerLabel="Kills"
-            entries={data.topKillers}
-          />
-
-          <div className="flex flex-col gap-8">
-            <LeaderboardTable
-              title="TOP SURVIVORS (K/D)"
-              titleClass="text-sky-400"
-              headerLabel="K/D"
-              entries={data.topSurvivors}
-              emptyMessage="No survivors ranked yet"
+        {data.kaosImageUrl ? (
+          <div className="space-y-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={data.kaosImageUrl}
+              alt={`${data.serverName} leaderboard`}
+              className="w-full h-auto rounded-lg border border-white/10"
             />
-            <LeaderboardTable
-              title="TOP VICTIMS"
-              titleClass="text-orange-400"
-              headerLabel="Deaths"
-              entries={data.topVictims}
-            />
+            <p className="text-[10px] sm:text-xs font-mono text-muted text-center">
+              Live stats from KAOS — synced from Discord
+            </p>
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+            <LeaderboardTable
+              title="TOP KILLERS"
+              titleClass="text-primary"
+              headerLabel="Kills"
+              entries={data.topKillers}
+            />
+
+            <div className="flex flex-col gap-8">
+              <LeaderboardTable
+                title="TOP SURVIVORS (K/D)"
+                titleClass="text-sky-400"
+                headerLabel="K/D"
+                entries={data.topSurvivors}
+                emptyMessage="No survivors ranked yet"
+              />
+              <LeaderboardTable
+                title="TOP VICTIMS"
+                titleClass="text-orange-400"
+                headerLabel="Deaths"
+                entries={data.topVictims}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="px-4 sm:px-6 py-3 border-t border-white/10 bg-black/20">
