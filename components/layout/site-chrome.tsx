@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { AnimatedBackground } from '@/components/effects/animated-background';
 import type { Store } from '@/lib/schemas';
 
 interface SiteChromeProps {
@@ -20,9 +21,12 @@ export function SiteChrome({ initialStore, children }: SiteChromeProps) {
 
   return (
     <>
-      <Header initialStore={initialStore} />
-      <main className="flex-1">{children}</main>
-      <Footer initialStore={initialStore} />
+      <AnimatedBackground />
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <Header initialStore={initialStore} />
+        <main className="flex-1">{children}</main>
+        <Footer initialStore={initialStore} />
+      </div>
     </>
   );
 }

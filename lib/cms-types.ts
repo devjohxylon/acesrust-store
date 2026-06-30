@@ -38,3 +38,29 @@ export const WIPE_TYPE_LABELS: Record<WipeType, string> = {
   blueprint: 'Blueprint Wipe',
   full: 'Full Wipe',
 };
+
+export type ServerStatus = {
+  online: boolean;
+  players: number;
+  maxPlayers: number;
+  queued: number;
+  serverName: string | null;
+  updatedAt: string | null;
+};
+
+export type ServerStatusInput = {
+  online?: boolean;
+  players: number;
+  maxPlayers: number;
+  queued?: number;
+  serverName?: string | null;
+};
+
+export const EMPTY_SERVER_STATUS: ServerStatus = {
+  online: false,
+  players: 0,
+  maxPlayers: 0,
+  queued: 0,
+  serverName: null,
+  updatedAt: null,
+};

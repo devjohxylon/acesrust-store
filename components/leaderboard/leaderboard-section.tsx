@@ -12,7 +12,6 @@ export async function LeaderboardSection({ showViewAll = true }: LeaderboardSect
 
   return (
     <section className="py-16 md:py-20 relative">
-      <div className="absolute inset-0 grid-pattern opacity-15" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">

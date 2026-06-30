@@ -1,3 +1,6 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import type { LeaderboardData, LeaderboardEntry } from '@/lib/leaderboard-data';
 
 type LeaderboardBoardProps = {
@@ -40,18 +43,28 @@ function LeaderboardTable({
           {emptyMessage ?? 'No data yet'}
         </p>
       ) : (
-        <ul className="space-y-0.5">
+        <motion.ul
+          className="space-y-0.5"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={{ show: { transition: { staggerChildren: 0.04 } } }}
+        >
           {entries.map((entry) => (
-            <li
+            <motion.li
               key={`${title}-${entry.rank}-${entry.player}`}
-              className="grid grid-cols-[2rem_1fr_3rem] gap-x-2 text-[11px] sm:text-xs font-mono px-1 py-0.5 rounded hover:bg-white/5"
+              variants={{
+                hidden: { opacity: 0, x: -12 },
+                show: { opacity: 1, x: 0, transition: { duration: 0.35 } },
+              }}
+              className="grid grid-cols-[2rem_1fr_3rem] gap-x-2 text-[11px] sm:text-xs font-mono px-1 py-0.5 rounded hover:bg-white/5 transition-colors"
             >
               <span className={rankClass(entry.rank)}>{entry.rank}</span>
               <span className={`truncate ${rankClass(entry.rank)}`}>{entry.player}</span>
               <span className={`text-right ${rankClass(entry.rank)}`}>{entry.value}</span>
-            </li>
+            </motion.li>
           ))}
-        </ul>
+        </motion.ul>
       )}
     </div>
   );
@@ -63,7 +76,13 @@ export function LeaderboardBoard({ data }: LeaderboardBoardProps) {
     : data.kaosImageUrl ?? null;
 
   return (
-    <div className="rounded-xl border border-border bg-[#1a1a1a] overflow-hidden shadow-2xl">
+    <motion.div
+      initial={{ opacity: 0, y: 28, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
+      className="relative rounded-xl border border-primary/20 bg-[#1a1a1a] overflow-hidden shadow-2xl glow-primary"
+    >
       <div className="px-4 sm:px-6 py-4 border-b border-white/10 bg-black/30">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <h2 className="text-lg sm:text-xl font-bold font-mono text-white tracking-tight">
@@ -78,7 +97,13 @@ export function LeaderboardBoard({ data }: LeaderboardBoardProps) {
 
       <div className="p-4 sm:p-6">
         {kaosImageSrc ? (
-          <div className="space-y-4">
+          <motion.div
+            className="space-y-4"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={kaosImageSrc}
@@ -88,7 +113,7 @@ export function LeaderboardBoard({ data }: LeaderboardBoardProps) {
             <p className="text-[10px] sm:text-xs font-mono text-muted text-center">
               Live stats from KAOS — synced from Discord
             </p>
-          </div>
+          </motion.div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
             <LeaderboardTable
@@ -122,6 +147,6 @@ export function LeaderboardBoard({ data }: LeaderboardBoardProps) {
           {data.updatedAt}
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 }

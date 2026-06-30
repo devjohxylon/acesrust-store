@@ -1,6 +1,8 @@
 import type { LeaderboardData } from '@/lib/leaderboard-data';
 import type {
   LeaderboardUpdateInput,
+  ServerStatus,
+  ServerStatusInput,
   WipeSchedule,
   WipeScheduleInput,
 } from '@/lib/cms-types';
@@ -92,4 +94,27 @@ export async function deleteWipe(id: string): Promise<void> {
   const data = await readCmsData();
   data.wipes = data.wipes.filter((wipe) => wipe.id !== id);
   await writeCmsData(data);
+}
+
+export async function getServerStatus(): Promise<ServerStatus> {
+  const { server } = await readCmsData();
+  return server;
+}
+
+export async function saveServerStatus(input: ServerStatusInput): Promise<ServerStatus> {
+  const data = await readCmsData();
+  const players = Math.max(0, Math.round(input.players));
+  const maxPlayers = Math.max(0, Math.round(input.maxPlayers));
+
+  data.server = {
+    online: input.online ?? true,
+    players,
+    maxPlayers,
+    queued: Math.max(0, Math.round(input.queued ?? 0)),
+    serverName: input.serverName?.trim() || data.server.serverName || null,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await writeCmsData(data);
+  return data.server;
 }

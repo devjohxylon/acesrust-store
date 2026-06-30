@@ -28,7 +28,6 @@ export default async function WipesPage() {
 
   return (
     <div className="min-h-screen py-12 md:py-16">
-      <div className="absolute inset-0 grid-pattern opacity-15 pointer-events-none" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">

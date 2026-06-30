@@ -2,18 +2,20 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { get, put } from '@vercel/blob';
 import { placeholderLeaderboard, type LeaderboardData } from '@/lib/leaderboard-data';
-import type { WipeSchedule } from '@/lib/cms-types';
+import { EMPTY_SERVER_STATUS, type ServerStatus, type WipeSchedule } from '@/lib/cms-types';
 import { getCmsBackend } from '@/lib/cms-config';
 
 export type CmsData = {
   leaderboard: LeaderboardData;
   wipes: WipeSchedule[];
+  server: ServerStatus;
 };
 
 function defaultData(): CmsData {
   return {
     leaderboard: placeholderLeaderboard,
     wipes: [],
+    server: EMPTY_SERVER_STATUS,
   };
 }
 
@@ -57,14 +59,24 @@ async function fileWrite(data: CmsData): Promise<void> {
   await fs.writeFile(dataFile, JSON.stringify(data, null, 2), 'utf8');
 }
 
+function normalize(data: CmsData | null): CmsData {
+  const base = defaultData();
+  if (!data) return base;
+  return {
+    leaderboard: data.leaderboard ?? base.leaderboard,
+    wipes: data.wipes ?? base.wipes,
+    server: data.server ?? base.server,
+  };
+}
+
 export async function readCmsData(): Promise<CmsData> {
   switch (getCmsBackend()) {
     case 'blob':
-      return (await blobRead()) ?? defaultData();
+      return normalize(await blobRead());
     case 'file':
-      return (await fileRead()) ?? defaultData();
+      return normalize(await fileRead());
     default:
-      return memoryData ?? defaultData();
+      return normalize(memoryData);
   }
 }
 
