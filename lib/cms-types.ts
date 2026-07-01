@@ -64,3 +64,27 @@ export const EMPTY_SERVER_STATUS: ServerStatus = {
   serverName: null,
   updatedAt: null,
 };
+
+export type PurchaseEntry = {
+  id: string;
+  buyer: string;
+  product: string;
+  amount: number;
+  currency: string;
+  at: string;
+};
+
+export type PurchaseInput = {
+  buyer: string;
+  product: string;
+  amount: number;
+  currency: string;
+};
+
+export type PopPoint = {
+  t: string;
+  players: number;
+};
+
+export const MAX_PURCHASES = 20;
+export const MAX_POP_POINTS = 500;

@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { getStoreWhoami } from '@/lib/api-client';
 import { ProductsGrid } from '@/components/home/products-grid';
 import { Hero } from '@/components/home/hero';
+import { PurchasesTicker } from '@/components/home/purchases-ticker';
+import { WipeCountdown } from '@/components/home/wipe-countdown';
+import { PopGraph } from '@/components/server/pop-graph';
 import { LeaderboardSection } from '@/components/leaderboard/leaderboard-section';
 import { WipesSection } from '@/components/wipes/wipes-section';
 import { siteConfig } from '@/lib/site';
@@ -19,10 +22,22 @@ async function HomePage() {
         descriptionHtml={store?.description || siteConfig.heroFallback}
       />
 
+      <PurchasesTicker />
+
+      <WipeCountdown />
+
       {/* Products Grid - Client Component */}
       <ProductsGrid />
 
       <LeaderboardSection showViewAll={false} />
+
+      <section className="pb-4 relative">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-5xl mx-auto">
+            <PopGraph />
+          </div>
+        </div>
+      </section>
 
       <WipesSection showViewAll={false} />
 

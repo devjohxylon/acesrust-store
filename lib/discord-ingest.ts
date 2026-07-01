@@ -1,6 +1,7 @@
 import { put } from '@vercel/blob';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import type { LeaderboardData } from '@/lib/leaderboard-data';
+import { safeCompare } from '@/lib/security';
 
 export type DiscordIngestPayload = {
   type: string;
@@ -82,8 +83,9 @@ export function verifyDiscordIngestSecret(request: Request) {
     return { ok: false as const, status: 500, error: 'WEBSITE_API_SECRET not configured' };
   }
 
-  const auth = request.headers.get('authorization');
-  if (auth !== `Bearer ${secret}`) {
+  const auth = request.headers.get('authorization') ?? '';
+  const expected = `Bearer ${secret}`;
+  if (!safeCompare(auth, expected)) {
     return { ok: false as const, status: 401, error: 'Unauthorized' };
   }
 

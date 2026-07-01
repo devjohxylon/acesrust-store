@@ -1,10 +1,15 @@
 import type { LeaderboardData } from '@/lib/leaderboard-data';
-import type {
-  LeaderboardUpdateInput,
-  ServerStatus,
-  ServerStatusInput,
-  WipeSchedule,
-  WipeScheduleInput,
+import {
+  MAX_POP_POINTS,
+  MAX_PURCHASES,
+  type LeaderboardUpdateInput,
+  type PopPoint,
+  type PurchaseEntry,
+  type PurchaseInput,
+  type ServerStatus,
+  type ServerStatusInput,
+  type WipeSchedule,
+  type WipeScheduleInput,
 } from '@/lib/cms-types';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 
@@ -105,6 +110,7 @@ export async function saveServerStatus(input: ServerStatusInput): Promise<Server
   const data = await readCmsData();
   const players = Math.max(0, Math.round(input.players));
   const maxPlayers = Math.max(0, Math.round(input.maxPlayers));
+  const now = new Date().toISOString();
 
   data.server = {
     online: input.online ?? true,
@@ -112,9 +118,39 @@ export async function saveServerStatus(input: ServerStatusInput): Promise<Server
     maxPlayers,
     queued: Math.max(0, Math.round(input.queued ?? 0)),
     serverName: input.serverName?.trim() || data.server.serverName || null,
-    updatedAt: new Date().toISOString(),
+    updatedAt: now,
   };
+
+  data.popHistory = [...(data.popHistory ?? []), { t: now, players }].slice(-MAX_POP_POINTS);
 
   await writeCmsData(data);
   return data.server;
+}
+
+export async function getPurchases(): Promise<PurchaseEntry[]> {
+  const { purchases } = await readCmsData();
+  return purchases;
+}
+
+export async function addPurchase(input: PurchaseInput): Promise<PurchaseEntry> {
+  const data = await readCmsData();
+
+  const entry: PurchaseEntry = {
+    id: crypto.randomUUID(),
+    buyer: input.buyer.trim().slice(0, 40) || 'Someone',
+    product: input.product.trim().slice(0, 80) || 'a product',
+    amount: Number.isFinite(input.amount) ? input.amount : 0,
+    currency: input.currency.trim().slice(0, 8) || 'USD',
+    at: new Date().toISOString(),
+  };
+
+  data.purchases = [entry, ...(data.purchases ?? [])].slice(0, MAX_PURCHASES);
+  await writeCmsData(data);
+  return entry;
+}
+
+export async function getPopHistory(hours = 24): Promise<PopPoint[]> {
+  const { popHistory } = await readCmsData();
+  const cutoff = Date.now() - hours * 60 * 60 * 1000;
+  return (popHistory ?? []).filter((point) => new Date(point.t).getTime() >= cutoff);
 }

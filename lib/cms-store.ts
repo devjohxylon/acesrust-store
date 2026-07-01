@@ -2,13 +2,21 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { get, put } from '@vercel/blob';
 import { placeholderLeaderboard, type LeaderboardData } from '@/lib/leaderboard-data';
-import { EMPTY_SERVER_STATUS, type ServerStatus, type WipeSchedule } from '@/lib/cms-types';
+import {
+  EMPTY_SERVER_STATUS,
+  type PopPoint,
+  type PurchaseEntry,
+  type ServerStatus,
+  type WipeSchedule,
+} from '@/lib/cms-types';
 import { getCmsBackend } from '@/lib/cms-config';
 
 export type CmsData = {
   leaderboard: LeaderboardData;
   wipes: WipeSchedule[];
   server: ServerStatus;
+  purchases: PurchaseEntry[];
+  popHistory: PopPoint[];
 };
 
 function defaultData(): CmsData {
@@ -16,6 +24,8 @@ function defaultData(): CmsData {
     leaderboard: placeholderLeaderboard,
     wipes: [],
     server: EMPTY_SERVER_STATUS,
+    purchases: [],
+    popHistory: [],
   };
 }
 
@@ -66,6 +76,8 @@ function normalize(data: CmsData | null): CmsData {
     leaderboard: data.leaderboard ?? base.leaderboard,
     wipes: data.wipes ?? base.wipes,
     server: data.server ?? base.server,
+    purchases: data.purchases ?? base.purchases,
+    popHistory: data.popHistory ?? base.popHistory,
   };
 }
 
