@@ -8,6 +8,8 @@ import { WipeCountdown } from '@/components/home/wipe-countdown';
 import { PopGraph } from '@/components/server/pop-graph';
 import { LeaderboardSection } from '@/components/leaderboard/leaderboard-section';
 import { WipesSection } from '@/components/wipes/wipes-section';
+import { ChallengeStrip } from '@/components/engagement/challenge-strip';
+import { ActivityFeed } from '@/components/engagement/activity-feed';
 import { siteConfig } from '@/lib/site';
 
 export const revalidate = 60;
@@ -26,10 +28,14 @@ async function HomePage() {
 
       <WipeCountdown />
 
+      <ChallengeStrip />
+
       {/* Products Grid - Client Component */}
       <ProductsGrid />
 
       <LeaderboardSection showViewAll={false} />
+
+      <ActivityFeed />
 
       <section className="pb-4 relative">
         <div className="container mx-auto px-4 relative z-10">

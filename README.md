@@ -458,3 +458,37 @@ This project is provided as-is for integration with Tip4Serv.
 Your store ID is automatically fetched from `GET /store/whoami`. To change the store, update the API key in `.env.local`.
 
 Current store details are displayed in the header and footer, dynamically pulled from the API.
+
+## Engagement Hub
+
+The site includes an optional player engagement system: Discord login, daily
+check-in streaks, a points economy, achievements with rarity stats, weekly
+challenges, a rewards store, public player profiles, and a community activity
+feed. Full design in
+[docs/superpowers/specs/2026-07-04-engagement-hub-design.md](docs/superpowers/specs/2026-07-04-engagement-hub-design.md).
+
+### Setup
+
+1. Create a Supabase project and run [supabase/schema.sql](supabase/schema.sql)
+   in the SQL editor (Dashboard > SQL Editor).
+2. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (Settings > API).
+3. Set `AUTH_SECRET` to a long random string (signs the login session cookie).
+4. In the Discord developer portal, add
+   `https://yourdomain.com/api/auth/discord/callback` as an OAuth2 redirect and
+   ensure `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` are set.
+
+Leave the Supabase variables empty and the rest of the site works exactly as
+before — engagement UI hides itself automatically.
+
+### How points work
+
+- **Daily check-in**: automatic on the first visit of the day (UTC), pays
+  `10 + 5 × (streak − 1)` points, capped at 80/day. Missing a day resets the streak.
+- **Purchases**: 5 points per $1, credited from the Tip4Serv webhook only after
+  a verified live payment (idempotent — retried webhooks never double-credit).
+  The buyer must have logged into the site with the same Discord account.
+- **Achievements & challenges**: awarded server-side; definitions live in
+  `lib/engagement/achievements.ts`, challenges are managed at `/admin/engagement`.
+- **Redemptions**: players spend points at `/rewards`; each redemption lands in
+  a pending queue at `/admin/engagement` for you to fulfill (coupon code,
+  Discord role, in-game kit) or refund.

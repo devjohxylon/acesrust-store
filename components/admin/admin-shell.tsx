@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Calendar, LayoutDashboard, LogOut, Trophy } from 'lucide-react';
+import { Calendar, LayoutDashboard, LogOut, Sparkles, Trophy } from 'lucide-react';
 import { siteConfig } from '@/lib/site';
 
 const navItems = [
   { href: '/admin' as const, label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/leaderboard' as const, label: 'Leaderboard', icon: Trophy },
   { href: '/admin/wipes' as const, label: 'Wipe Schedule', icon: Calendar },
+  { href: '/admin/engagement' as const, label: 'Engagement', icon: Sparkles },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

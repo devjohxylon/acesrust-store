@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Store } from '@/lib/schemas';
 import { siteConfig } from '@/lib/site';
+import { LoginButton } from '@/components/engagement/login-button';
 
 interface HeaderProps {
   initialStore?: Store | null;
@@ -102,6 +103,15 @@ export function Header({ initialStore }: HeaderProps) {
                 Wipes
               </Link>
             )}
+            {isActive('/rewards') ? (
+              <span className="text-sm text-white font-semibold cursor-default">
+                Rewards
+              </span>
+            ) : (
+              <Link href="/rewards" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
+                Rewards
+              </Link>
+            )}
             {store?.menu_links?.map((menuLink, index) => (
               <a
                 key={index}
@@ -136,15 +146,19 @@ export function Header({ initialStore }: HeaderProps) {
                 </AnimatePresence>
               </div>
             </Link>
+            <LoginButton />
           </nav>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 cursor-pointer"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <LoginButton />
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 cursor-pointer"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -177,6 +191,13 @@ export function Header({ initialStore }: HeaderProps) {
               onClick={() => setMobileMenuOpen(false)}
             >
               Wipes
+            </Link>
+            <Link 
+              href="/rewards" 
+              className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Rewards
             </Link>
             {store?.menu_links?.map((menuLink, index) => (
               <a
