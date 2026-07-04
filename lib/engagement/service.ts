@@ -7,6 +7,11 @@ import {
   evaluateAchievements,
 } from '@/lib/engagement/achievements';
 import { REWARD_MAP } from '@/lib/engagement/rewards';
+import {
+  grantLegendRole,
+  isLegendRoleConfigured,
+  postToFeedChannel,
+} from '@/lib/engagement/discord';
 import { getAllWipes } from '@/lib/cms-service';
 import { getLeaderboard } from '@/lib/cms-service';
 import type { LeaderboardData } from '@/lib/leaderboard-data';
@@ -24,6 +29,13 @@ import type {
 
 const STREAK_MILESTONES = new Set([7, 14, 30, 60, 100]);
 
+const FEED_EMOJI: Record<string, string> = {
+  achievement: '🏆',
+  streak: '🔥',
+  purchase: '💎',
+  challenge: '⚡',
+};
+
 async function addFeedEvent(
   profile: EngagementProfile,
   type: string,
@@ -33,6 +45,9 @@ async function addFeedEvent(
   await engagementDb()
     .from('activity_events')
     .insert({ discord_id: profile.discord_id, type, message });
+
+  const emoji = FEED_EMOJI[type] ?? '✨';
+  await postToFeedChannel(`${emoji} **${profile.username}** ${message}`);
 }
 
 export async function upsertProfile(user: SessionUser): Promise<EngagementProfile> {
@@ -76,7 +91,7 @@ export async function getProfile(discordId: string): Promise<EngagementProfile |
 
 export async function updateProfileSettings(
   discordId: string,
-  settings: { game_name?: string | null; show_activity?: boolean }
+  settings: { game_name?: string | null; show_activity?: boolean; dm_reminders?: boolean }
 ): Promise<void> {
   await engagementDb()
     .from('engagement_profiles')
@@ -398,7 +413,24 @@ export async function redeemReward(
     return { ok: false, error: 'Not enough points' };
   }
 
-  return { ok: true, redemption: data as Redemption };
+  let redemption = data as Redemption;
+
+  // The Site Legend role is granted instantly when the bot is configured;
+  // everything else stays in the admin fulfillment queue.
+  if (reward.id === 'discord_legend' && isLegendRoleConfigured()) {
+    const granted = await grantLegendRole(user.id);
+    if (granted) {
+      const { data: fulfilled } = await db
+        .from('redemptions')
+        .update({ status: 'fulfilled', code: 'auto: role granted' })
+        .eq('id', redemption.id)
+        .select()
+        .single();
+      if (fulfilled) redemption = fulfilled as Redemption;
+    }
+  }
+
+  return { ok: true, redemption };
 }
 
 export async function getFeed(limit = 30): Promise<(ActivityEvent & { username: string; avatar: string | null })[]> {
@@ -587,4 +619,24 @@ export async function grantPoints(
   description: string
 ): Promise<number> {
   return adjustPoints(discordId, amount, 'admin_grant', description, null);
+}
+
+/**
+ * Players whose streak is alive (checked in yesterday) but who haven't checked
+ * in today — the group that would lose their streak at midnight UTC.
+ */
+export async function getStreakReminderCandidates(
+  now: Date
+): Promise<Pick<EngagementProfile, 'discord_id' | 'username' | 'streak_count'>[]> {
+  const yesterday = utcDateString(new Date(now.getTime() - 24 * 60 * 60 * 1000));
+
+  const { data } = await engagementDb()
+    .from('engagement_profiles')
+    .select('discord_id, username, streak_count')
+    .eq('dm_reminders', true)
+    .eq('last_checkin_date', yesterday)
+    .gte('streak_count', 2)
+    .limit(200);
+
+  return (data ?? []) as Pick<EngagementProfile, 'discord_id' | 'username' | 'streak_count'>[];
 }

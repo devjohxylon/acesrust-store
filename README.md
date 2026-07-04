@@ -492,3 +492,20 @@ before — engagement UI hides itself automatically.
 - **Redemptions**: players spend points at `/rewards`; each redemption lands in
   a pending queue at `/admin/engagement` for you to fulfill (coupon code,
   Discord role, in-game kit) or refund.
+
+### Discord integration (optional)
+
+With a bot token configured, the engagement hub runs itself inside Discord:
+
+- **Auto role grants** — redeeming the Site Legend reward grants the Discord
+  role instantly (no admin queue). Set `DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID`,
+  and `DISCORD_LEGEND_ROLE_ID`. The bot needs Manage Roles and its role must be
+  above the Site Legend role.
+- **Milestone mirror** — achievement unlocks, streak milestones, first
+  purchases, and challenge completions post to a channel. Set
+  `DISCORD_FEED_WEBHOOK_URL` (channel settings > Integrations > Webhooks).
+- **Streak reminder DMs** — a daily Vercel cron (18:00 UTC, see `vercel.json`)
+  DMs players whose streak expires at midnight. Opt-in via the toggle on
+  `/profile/me`. Set `CRON_SECRET` to enable the endpoint.
+
+Each piece is independent — configure any subset, the rest stays off.

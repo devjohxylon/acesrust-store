@@ -186,17 +186,28 @@ export function ProfileView({ discordId }: { discordId: string }) {
           </div>
         )}
 
-        {/* Privacy toggle (owner only) */}
+        {/* Settings (owner only) */}
         {isOwner && (
-          <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
-            <input
-              type="checkbox"
-              checked={profile.show_activity}
-              onChange={(e) => updateSettings.mutate({ show_activity: e.target.checked })}
-              className="accent-[var(--primary)]"
-            />
-            Show my milestones in the public community feed
-          </label>
+          <div className="space-y-2.5">
+            <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
+              <input
+                type="checkbox"
+                checked={profile.show_activity}
+                onChange={(e) => updateSettings.mutate({ show_activity: e.target.checked })}
+                className="accent-[var(--primary)]"
+              />
+              Show my milestones in the public community feed
+            </label>
+            <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
+              <input
+                type="checkbox"
+                checked={profile.dm_reminders}
+                onChange={(e) => updateSettings.mutate({ dm_reminders: e.target.checked })}
+                className="accent-[var(--primary)]"
+              />
+              DM me on Discord before my check-in streak expires
+            </label>
+          </div>
         )}
       </div>
     </div>

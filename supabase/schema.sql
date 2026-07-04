@@ -8,6 +8,7 @@ create table if not exists engagement_profiles (
   avatar text,
   game_name text,
   show_activity boolean not null default true,
+  dm_reminders boolean not null default false,
   streak_count integer not null default 0,
   last_checkin_date date,
   total_points integer not null default 0 check (total_points >= 0),
@@ -116,6 +117,10 @@ begin
   return new_balance;
 end;
 $$;
+
+-- Migration for databases created before the Discord integration.
+alter table engagement_profiles
+  add column if not exists dm_reminders boolean not null default false;
 
 alter table engagement_profiles enable row level security;
 alter table point_transactions enable row level security;

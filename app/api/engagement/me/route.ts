@@ -33,7 +33,8 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const settings: { game_name?: string | null; show_activity?: boolean } = {};
+  const settings: { game_name?: string | null; show_activity?: boolean; dm_reminders?: boolean } =
+    {};
   if ('game_name' in body) {
     const name = body.game_name;
     if (name !== null && typeof name !== 'string') {
@@ -43,6 +44,9 @@ export async function PATCH(request: NextRequest) {
   }
   if ('show_activity' in body) {
     settings.show_activity = Boolean(body.show_activity);
+  }
+  if ('dm_reminders' in body) {
+    settings.dm_reminders = Boolean(body.dm_reminders);
   }
 
   await updateProfileSettings(user.id, settings);

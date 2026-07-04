@@ -113,7 +113,7 @@ export function useUpdateProfileSettings() {
   return useMutation<
     { ok: boolean },
     Error,
-    { game_name?: string | null; show_activity?: boolean }
+    { game_name?: string | null; show_activity?: boolean; dm_reminders?: boolean }
   >({
     mutationFn: (settings) => postJson('/api/engagement/me', settings, 'PATCH'),
     onSuccess: () => {
