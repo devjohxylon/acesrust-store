@@ -5,6 +5,8 @@ export type EngagementProfile = {
   game_name: string | null;
   show_activity: boolean;
   dm_reminders: boolean;
+  referred_by: string | null;
+  referral_count: number;
   streak_count: number;
   last_checkin_date: string | null;
   total_points: number;

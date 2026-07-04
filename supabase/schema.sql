@@ -9,6 +9,8 @@ create table if not exists engagement_profiles (
   game_name text,
   show_activity boolean not null default true,
   dm_reminders boolean not null default false,
+  referred_by text,
+  referral_count integer not null default 0,
   streak_count integer not null default 0,
   last_checkin_date date,
   total_points integer not null default 0 check (total_points >= 0),
@@ -118,9 +120,33 @@ begin
 end;
 $$;
 
+-- Season leaderboard: points earned since a timestamp (i.e. the last wipe),
+-- so the spendable balance never resets — only the race does.
+create or replace function season_points_leaderboard(
+  p_since timestamptz,
+  p_limit integer default 50
+) returns table (discord_id text, username text, avatar text, points bigint)
+language sql
+security definer
+as $$
+  select p.discord_id, p.username, p.avatar, sum(t.amount)::bigint as points
+  from point_transactions t
+  join engagement_profiles p on p.discord_id = t.discord_id
+  where t.created_at >= p_since and t.amount > 0
+  group by p.discord_id, p.username, p.avatar
+  order by points desc
+  limit p_limit;
+$$;
+
 -- Migration for databases created before the Discord integration.
 alter table engagement_profiles
   add column if not exists dm_reminders boolean not null default false;
+
+-- Migration for databases created before the referral system.
+alter table engagement_profiles
+  add column if not exists referred_by text;
+alter table engagement_profiles
+  add column if not exists referral_count integer not null default 0;
 
 alter table engagement_profiles enable row level security;
 alter table point_transactions enable row level security;

@@ -34,9 +34,27 @@ function hasValidBypass(request: NextRequest) {
   return request.cookies.get('maintenance_bypass')?.value === BYPASS_SECRET;
 }
 
+/**
+ * Referral links look like https://site/?ref=<discordId>. The id is remembered
+ * in a cookie so attribution survives until the visitor logs in with Discord.
+ */
+function withReferralCookie(request: NextRequest, response: NextResponse) {
+  const ref = request.nextUrl.searchParams.get('ref');
+  if (ref && /^\d{5,25}$/.test(ref) && !request.cookies.get('aces_ref')) {
+    response.cookies.set('aces_ref', ref, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 30,
+      path: '/',
+    });
+  }
+  return response;
+}
+
 export function proxy(request: NextRequest) {
   if (!MAINTENANCE_MODE) {
-    return NextResponse.next();
+    return withReferralCookie(request, NextResponse.next());
   }
 
   const { pathname, searchParams } = request.nextUrl;

@@ -55,7 +55,8 @@ export async function GET(request: NextRequest) {
     };
 
     if (isEngagementConfigured()) {
-      await upsertProfile(user);
+      const referredBy = request.cookies.get('aces_ref')?.value ?? null;
+      await upsertProfile(user, referredBy);
     }
 
     const ok = await setUserSession(user);
@@ -63,6 +64,7 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.redirect(new URL(returnTo, origin));
     response.cookies.delete('aces_oauth');
+    response.cookies.delete('aces_ref');
     return response;
   } catch (error) {
     console.error('Discord login error:', error);

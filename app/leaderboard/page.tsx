@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { LeaderboardBoard } from '@/components/leaderboard/leaderboard-board';
+import { PointsRace } from '@/components/engagement/points-race';
 import { getLeaderboard } from '@/lib/cms-service';
 import { siteConfig } from '@/lib/site';
 
@@ -27,6 +28,10 @@ export default async function LeaderboardPage() {
           </div>
 
           <LeaderboardBoard data={data} />
+
+          <div className="mt-10">
+            <PointsRace />
+          </div>
         </div>
       </div>
     </div>

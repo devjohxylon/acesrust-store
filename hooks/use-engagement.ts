@@ -9,7 +9,7 @@ import type {
   Redemption,
   SessionUser,
 } from '@/lib/engagement/types';
-import type { CheckinOutcome } from '@/lib/engagement/service';
+import type { CheckinOutcome, SeasonLeaderboard } from '@/lib/engagement/service';
 
 export type FeedEvent = {
   id: string;
@@ -119,6 +119,14 @@ export function useUpdateProfileSettings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['engagement'] });
     },
+  });
+}
+
+export function usePointsLeaderboard() {
+  return useQuery<{ leaderboard: SeasonLeaderboard | null }>({
+    queryKey: ['engagement', 'points-leaderboard'],
+    queryFn: () => getJson('/api/engagement/points-leaderboard'),
+    staleTime: 60_000,
   });
 }
 

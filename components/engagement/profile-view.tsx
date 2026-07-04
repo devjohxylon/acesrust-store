@@ -2,7 +2,18 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Award, Calendar, Coins, Flame, Pencil, ShoppingBag, User } from 'lucide-react';
+import {
+  Award,
+  Calendar,
+  Check,
+  Coins,
+  Copy,
+  Flame,
+  Pencil,
+  ShoppingBag,
+  User,
+  Users,
+} from 'lucide-react';
 import { usePublicProfile, useUpdateProfileSettings } from '@/hooks/use-engagement';
 
 function formatDate(iso: string): string {
@@ -17,7 +28,60 @@ const TX_LABELS: Record<string, string> = {
   redemption: 'Redemption',
   refund: 'Refund',
   admin_grant: 'Adjustment',
+  referral: 'Referral',
+  referral_bonus: 'Referral Bonus',
 };
+
+function ReferralCard({ discordId, recruits }: { discordId: string; recruits: number }) {
+  const [copied, setCopied] = useState(false);
+  const link =
+    typeof window !== 'undefined' ? `${window.location.origin}/?ref=${discordId}` : '';
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable — the input below is selectable as a fallback.
+    }
+  }
+
+  return (
+    <div className="rounded-2xl bg-gradient-card border border-primary/20 p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2">
+        <Users className="w-5 h-5 text-primary" />
+        Recruit Friends
+      </h2>
+      <p className="text-sm text-muted mt-1">
+        Share your link. When a friend logs in through it and makes their first purchase, you
+        earn <span className="text-primary font-semibold">250 points</span> and they get{' '}
+        <span className="text-primary font-semibold">100 points</span>.
+      </p>
+      <div className="mt-4 flex items-center gap-2">
+        <input
+          readOnly
+          value={link}
+          onFocus={(e) => e.target.select()}
+          className="flex-1 min-w-0 px-3 py-2 rounded-lg bg-background border border-border text-xs text-muted"
+        />
+        <button
+          type="button"
+          onClick={copyLink}
+          className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary text-background text-xs font-semibold hover:bg-primary/90 cursor-pointer"
+        >
+          {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+          {copied ? 'Copied!' : 'Copy'}
+        </button>
+      </div>
+      {recruits > 0 && (
+        <p className="text-xs text-primary font-medium mt-3">
+          🤝 {recruits} {recruits === 1 ? 'player' : 'players'} recruited so far
+        </p>
+      )}
+    </div>
+  );
+}
 
 export function ProfileView({ discordId }: { discordId: string }) {
   const { data, isLoading, error } = usePublicProfile(discordId);
@@ -157,6 +221,9 @@ export function ProfileView({ discordId }: { discordId: string }) {
             ))}
           </div>
         </div>
+
+        {/* Referral card (owner only) */}
+        {isOwner && <ReferralCard discordId={profile.discord_id} recruits={profile.referral_count} />}
 
         {/* Own activity (owner only) */}
         {isOwner && transactions.length > 0 && (

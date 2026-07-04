@@ -34,6 +34,7 @@ const FEED_EMOJI: Record<string, string> = {
   streak: '🔥',
   purchase: '💎',
   challenge: '⚡',
+  referral: '🤝',
 };
 
 async function addFeedEvent(
@@ -50,7 +51,10 @@ async function addFeedEvent(
   await postToFeedChannel(`${emoji} **${profile.username}** ${message}`);
 }
 
-export async function upsertProfile(user: SessionUser): Promise<EngagementProfile> {
+export async function upsertProfile(
+  user: SessionUser,
+  referredBy?: string | null
+): Promise<EngagementProfile> {
   const db = engagementDb();
 
   const { data: existing } = await db
@@ -69,9 +73,26 @@ export async function upsertProfile(user: SessionUser): Promise<EngagementProfil
     return (data ?? existing) as EngagementProfile;
   }
 
+  // Referral attribution only counts on first signup, never yourself,
+  // and only when the referrer actually has a profile.
+  let referrer: string | null = null;
+  if (referredBy && referredBy !== user.id) {
+    const { data: referrerProfile } = await db
+      .from('engagement_profiles')
+      .select('discord_id')
+      .eq('discord_id', referredBy)
+      .maybeSingle();
+    if (referrerProfile) referrer = referredBy;
+  }
+
   const { data, error } = await db
     .from('engagement_profiles')
-    .insert({ discord_id: user.id, username: user.username, avatar: user.avatar })
+    .insert({
+      discord_id: user.id,
+      username: user.username,
+      avatar: user.avatar,
+      referred_by: referrer,
+    })
     .select()
     .single();
   if (error || !data) throw new Error(`Failed to create profile: ${error?.message}`);
@@ -347,8 +368,12 @@ export async function creditPurchase(input: {
     ref
   );
 
-  if (Number(profile.lifetime_spend) === 0) {
+  const isFirstPurchase = Number(profile.lifetime_spend) === 0;
+  if (isFirstPurchase) {
     await addFeedEvent(fresh, 'purchase', 'made their first purchase 💎');
+    if (fresh.referred_by) {
+      await payReferralReward(fresh);
+    }
   }
 
   const { data: unlockedRows } = await db
@@ -371,6 +396,126 @@ export async function creditPurchase(input: {
   let totalEarned = points + achievementPoints;
   totalEarned += await bumpChallenges(fresh, 'purchases', 1);
   await bumpChallenges(fresh, 'points_earned', totalEarned);
+}
+
+const REFERRER_REWARD = 250;
+const REFERRED_BONUS = 100;
+
+/** Pays out both sides of a referral when the recruited player first purchases. */
+async function payReferralReward(buyer: EngagementProfile): Promise<void> {
+  const db = engagementDb();
+  const referrer = await getProfile(buyer.referred_by!);
+  if (!referrer) return;
+
+  // Idempotent: a buyer can only ever trigger one payout.
+  const { data: dupe } = await db
+    .from('point_transactions')
+    .select('id')
+    .eq('ref', `referral:${buyer.discord_id}`)
+    .maybeSingle();
+  if (dupe) return;
+
+  await adjustPoints(
+    referrer.discord_id,
+    REFERRER_REWARD,
+    'referral',
+    `Referral reward: ${buyer.username} made their first purchase`,
+    `referral:${buyer.discord_id}`
+  );
+  await adjustPoints(
+    buyer.discord_id,
+    REFERRED_BONUS,
+    'referral_bonus',
+    'Welcome bonus for joining through a referral',
+    `referral-bonus:${buyer.discord_id}`
+  );
+
+  const { data: updatedReferrer } = await db
+    .from('engagement_profiles')
+    .update({ referral_count: referrer.referral_count + 1 })
+    .eq('discord_id', referrer.discord_id)
+    .select()
+    .single();
+  const freshReferrer = (updatedReferrer as EngagementProfile) ?? referrer;
+
+  await addFeedEvent(freshReferrer, 'referral', 'recruited a new player to the server 🤝');
+
+  const { data: unlockedRows } = await db
+    .from('user_achievements')
+    .select('achievement_id')
+    .eq('discord_id', referrer.discord_id);
+  const alreadyUnlocked = new Set((unlockedRows ?? []).map((r) => r.achievement_id as string));
+  const newIds = evaluateAchievements(
+    {
+      profile: freshReferrer,
+      leaderboard: null,
+      checkedInWithinWipeHour: false,
+      now: new Date(),
+    },
+    alreadyUnlocked
+  );
+  await unlockAchievements(freshReferrer, newIds);
+}
+
+export type SeasonLeaderboardEntry = {
+  rank: number;
+  discord_id: string;
+  username: string;
+  avatar: string | null;
+  points: number;
+};
+
+export type SeasonLeaderboard = {
+  seasonStart: string;
+  seasonLabel: string;
+  top: SeasonLeaderboardEntry[];
+  me: SeasonLeaderboardEntry | null;
+};
+
+/** The season starts at the most recent published wipe (fallback: start of month). */
+async function seasonStart(now: Date): Promise<{ start: Date; label: string }> {
+  try {
+    const wipes = (await getAllWipes()).filter(
+      (w) => w.isPublished && new Date(w.scheduledAt).getTime() <= now.getTime()
+    );
+    if (wipes.length > 0) {
+      const latest = wipes.reduce((a, b) =>
+        new Date(a.scheduledAt).getTime() > new Date(b.scheduledAt).getTime() ? a : b
+      );
+      return { start: new Date(latest.scheduledAt), label: latest.title };
+    }
+  } catch {
+    // CMS unavailable — fall through to the monthly window.
+  }
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  return { start: monthStart, label: 'This Month' };
+}
+
+export async function getSeasonLeaderboard(
+  discordId: string | null
+): Promise<SeasonLeaderboard> {
+  const now = new Date();
+  const { start, label } = await seasonStart(now);
+
+  const { data, error } = await engagementDb().rpc('season_points_leaderboard', {
+    p_since: start.toISOString(),
+    p_limit: 50,
+  });
+  if (error) throw new Error(error.message);
+
+  const rows = (data ?? []) as Omit<SeasonLeaderboardEntry, 'rank'>[];
+  const ranked = rows.map((row, index) => ({
+    ...row,
+    points: Number(row.points),
+    rank: index + 1,
+  }));
+
+  return {
+    seasonStart: start.toISOString(),
+    seasonLabel: label,
+    top: ranked.slice(0, 10),
+    me: discordId ? (ranked.find((r) => r.discord_id === discordId) ?? null) : null,
+  };
 }
 
 export async function redeemReward(

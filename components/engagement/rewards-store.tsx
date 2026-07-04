@@ -105,6 +105,7 @@ export function RewardsStore() {
             <li>Shop purchases — 5 points back per $1 spent</li>
             <li>Unlock achievements — 25 to 500 points each</li>
             <li>Complete weekly challenges — 50 to 150 points each</li>
+            <li>Recruit friends — 250 points when they make their first purchase (link on your profile)</li>
           </ul>
         </div>
       </div>

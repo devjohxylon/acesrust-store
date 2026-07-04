@@ -18,6 +18,8 @@ export const ACHIEVEMENTS: AchievementDefinition[] = [
   // Community
   { id: 'early_bird', name: 'Early Bird', description: 'Check in within an hour of a wipe going live', category: 'community', points: 75, icon: '🐦' },
   { id: 'wipe_warrior', name: 'Wipe Day Warrior', description: 'Check in on 5 different wipe days', category: 'community', points: 100, icon: '💪' },
+  { id: 'recruiter', name: 'Recruiter', description: 'Refer a friend who makes their first purchase', category: 'community', points: 100, icon: '🤝' },
+  { id: 'headhunter', name: 'Headhunter', description: 'Refer 5 friends who make purchases', category: 'community', points: 300, icon: '🎯' },
 ];
 
 export const ACHIEVEMENT_MAP = new Map(ACHIEVEMENTS.map((a) => [a.id, a]));
@@ -67,6 +69,8 @@ export function evaluateAchievements(
 
   check('early_bird', ctx.checkedInWithinWipeHour);
   check('wipe_warrior', profile.wipe_checkin_count >= 5);
+  check('recruiter', profile.referral_count >= 1);
+  check('headhunter', profile.referral_count >= 5);
 
   return earned;
 }

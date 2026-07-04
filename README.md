@@ -493,6 +493,19 @@ before — engagement UI hides itself automatically.
   a pending queue at `/admin/engagement` for you to fulfill (coupon code,
   Discord role, in-game kit) or refund.
 
+### Points Race & referrals
+
+- **Points Race** (on `/leaderboard`): ranks players by points earned since the
+  most recent published wipe, so the competitive ladder resets every wipe while
+  spendable balances never do. Falls back to a monthly window when no wipes are
+  scheduled.
+- **Referrals**: every player gets a personal link (`/?ref=<discordId>`, shown
+  on their profile). When a referred friend logs in through it and makes their
+  first purchase, the referrer earns 250 points (plus Recruiter/Headhunter
+  achievements) and the friend gets a 100-point welcome bonus. Attribution is
+  cookie-based (30 days), validated server-side, and pays out at most once per
+  recruited player.
+
 ### Discord integration (optional)
 
 With a bot token configured, the engagement hub runs itself inside Discord:
