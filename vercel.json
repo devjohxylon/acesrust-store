@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/wipe-prize-winners",
-      "schedule": "0 * * * *"
+      "schedule": "0 19 * * *"
     }
   ]
 }
