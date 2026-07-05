@@ -5,6 +5,7 @@ import {
   getAchievementsState,
   getProfile,
   getRecentTransactions,
+  upsertProfile,
 } from '@/lib/engagement/service';
 
 export async function GET(
@@ -16,13 +17,20 @@ export async function GET(
   }
 
   const { discordId } = await params;
-  const profile = await getProfile(discordId);
+  const user = await getUserSession();
+  const isOwner = user?.id === discordId;
+
+  let profile = await getProfile(discordId);
+  if (!profile && isOwner && user) {
+    try {
+      profile = await upsertProfile(user);
+    } catch (error) {
+      console.error('Failed to create profile on demand:', error);
+    }
+  }
   if (!profile) {
     return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
   }
-
-  const user = await getUserSession();
-  const isOwner = user?.id === discordId;
 
   const [achievements, transactions] = await Promise.all([
     getAchievementsState(discordId),

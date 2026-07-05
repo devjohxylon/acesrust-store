@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Crown, User, Zap } from 'lucide-react';
 import { useMe, usePointsLeaderboard } from '@/hooks/use-engagement';
+import { isValidAvatarUrl } from '@/lib/engagement/avatar';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
@@ -53,7 +54,7 @@ export function PointsRace() {
                 )}
               </span>
               <span className="relative w-8 h-8 rounded-full overflow-hidden bg-border shrink-0">
-                {entry.avatar ? (
+                {isValidAvatarUrl(entry.avatar) ? (
                   <Image src={entry.avatar} alt={entry.username} fill className="object-cover" unoptimized />
                 ) : (
                   <User className="w-4 h-4 absolute inset-0 m-auto text-muted" />

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Activity, User } from 'lucide-react';
 import { useFeed } from '@/hooks/use-engagement';
+import { isValidAvatarUrl } from '@/lib/engagement/avatar';
 
 function timeAgo(iso: string): string {
   const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -37,7 +38,7 @@ export function ActivityFeed() {
                 className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors"
               >
                 <span className="relative w-8 h-8 rounded-full overflow-hidden bg-border shrink-0">
-                  {event.avatar ? (
+                  {isValidAvatarUrl(event.avatar) ? (
                     <Image src={event.avatar} alt={event.username} fill className="object-cover" unoptimized />
                   ) : (
                     <User className="w-4 h-4 absolute inset-0 m-auto text-muted" />

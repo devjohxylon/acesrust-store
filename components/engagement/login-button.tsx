@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Award, Flame, Gift, LogOut, User } from 'lucide-react';
 import { FaDiscord } from 'react-icons/fa';
 import { useLogout, useMe } from '@/hooks/use-engagement';
+import { isValidAvatarUrl } from '@/lib/engagement/avatar';
 
 export function LoginButton() {
   const { data, isLoading } = useMe();
@@ -15,7 +16,12 @@ export function LoginButton() {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function onClickOutside(event: MouseEvent) {
@@ -27,7 +33,7 @@ export function LoginButton() {
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
 
-  if (isLoading) {
+  if (!mounted || isLoading) {
     return <div className="w-24 h-9 rounded-lg bg-card border border-border shimmer" />;
   }
 
@@ -54,7 +60,7 @@ export function LoginButton() {
         className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-lg bg-card border border-border hover:border-primary transition-colors cursor-pointer"
       >
         <span className="relative w-7 h-7 rounded-full overflow-hidden bg-border shrink-0">
-          {user.avatar ? (
+          {isValidAvatarUrl(user.avatar) ? (
             <Image src={user.avatar} alt={user.username} fill className="object-cover" unoptimized />
           ) : (
             <User className="w-4 h-4 absolute inset-0 m-auto text-muted" />

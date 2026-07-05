@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   Award,
@@ -15,6 +15,7 @@ import {
   Users,
 } from 'lucide-react';
 import { usePublicProfile, useUpdateProfileSettings } from '@/hooks/use-engagement';
+import { isValidAvatarUrl } from '@/lib/engagement/avatar';
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -34,8 +35,11 @@ const TX_LABELS: Record<string, string> = {
 
 function ReferralCard({ discordId, recruits }: { discordId: string; recruits: number }) {
   const [copied, setCopied] = useState(false);
-  const link =
-    typeof window !== 'undefined' ? `${window.location.origin}/?ref=${discordId}` : '';
+  const [link, setLink] = useState('');
+
+  useEffect(() => {
+    setLink(`${window.location.origin}/?ref=${discordId}`);
+  }, [discordId]);
 
   async function copyLink() {
     try {
@@ -120,7 +124,7 @@ export function ProfileView({ discordId }: { discordId: string }) {
         <div className="rounded-2xl bg-gradient-card border border-primary/20 p-8">
           <div className="flex items-center gap-5">
             <span className="relative w-20 h-20 rounded-full overflow-hidden bg-border shrink-0 border-2 border-primary/40">
-              {profile.avatar ? (
+              {isValidAvatarUrl(profile.avatar) ? (
                 <Image src={profile.avatar} alt={profile.username} fill className="object-cover" unoptimized />
               ) : (
                 <User className="w-8 h-8 absolute inset-0 m-auto text-muted" />
