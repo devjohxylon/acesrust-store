@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { setUserSession } from '@/lib/engagement/session';
+import { applySessionCookie, discordAuthRedirectUri } from '@/lib/engagement/session';
 import { isEngagementConfigured } from '@/lib/engagement/db';
 import { upsertProfile } from '@/lib/engagement/service';
 import { safeCompare } from '@/lib/security';
@@ -23,6 +23,8 @@ export async function GET(request: NextRequest) {
   const returnTo = separator === -1 ? '/' : stored.slice(separator + 1) || '/';
   if (!safeCompare(nonce, state)) return fail(origin, 'state_mismatch');
 
+  const redirectUri = discordAuthRedirectUri(origin);
+
   try {
     const tokenResponse = await fetch(`${DISCORD_API}/oauth2/token`, {
       method: 'POST',
@@ -32,10 +34,15 @@ export async function GET(request: NextRequest) {
         client_secret: process.env.DISCORD_CLIENT_SECRET || '',
         code,
         grant_type: 'authorization_code',
-        redirect_uri: `${origin}/api/auth/discord/callback`,
+        redirect_uri: redirectUri,
       }),
     });
-    if (!tokenResponse.ok) return fail(origin, 'token_exchange');
+
+    if (!tokenResponse.ok) {
+      const detail = await tokenResponse.text();
+      console.error('Discord token exchange failed:', tokenResponse.status, detail);
+      return fail(origin, 'token_exchange');
+    }
 
     const { access_token: accessToken } = await tokenResponse.json();
     const userResponse = await fetch(`${DISCORD_API}/users/@me`, {
@@ -54,15 +61,21 @@ export async function GET(request: NextRequest) {
       avatar,
     };
 
+    // Profile creation is best-effort — login must succeed even if Supabase is down.
     if (isEngagementConfigured()) {
-      const referredBy = request.cookies.get('aces_ref')?.value ?? null;
-      await upsertProfile(user, referredBy);
+      try {
+        const referredBy = request.cookies.get('aces_ref')?.value ?? null;
+        await upsertProfile(user, referredBy);
+      } catch (error) {
+        console.error('Profile upsert failed (login continues):', error);
+      }
     }
 
-    const ok = await setUserSession(user);
-    if (!ok) return fail(origin, 'no_secret');
+    const landing = new URL(returnTo, origin);
+    landing.searchParams.set('logged_in', '1');
+    const response = NextResponse.redirect(landing);
+    if (!applySessionCookie(response, user)) return fail(origin, 'no_secret');
 
-    const response = NextResponse.redirect(new URL(returnTo, origin));
     response.cookies.delete('aces_oauth');
     response.cookies.delete('aces_ref');
     return response;

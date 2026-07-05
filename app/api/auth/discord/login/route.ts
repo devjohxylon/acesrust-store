@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
+import { discordAuthRedirectUri } from '@/lib/engagement/session';
 
 export async function GET(request: NextRequest) {
   const clientId = process.env.DISCORD_CLIENT_ID || process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID;
@@ -10,10 +11,11 @@ export async function GET(request: NextRequest) {
   const returnTo = request.nextUrl.searchParams.get('return_to') || '/';
   const safeReturn = returnTo.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/';
   const nonce = randomBytes(16).toString('hex');
+  const redirectUri = discordAuthRedirectUri(request.nextUrl.origin);
 
   const authorize = new URL('https://discord.com/api/oauth2/authorize');
   authorize.searchParams.set('client_id', clientId);
-  authorize.searchParams.set('redirect_uri', `${request.nextUrl.origin}/api/auth/discord/callback`);
+  authorize.searchParams.set('redirect_uri', redirectUri);
   authorize.searchParams.set('response_type', 'code');
   authorize.searchParams.set('scope', 'identify');
   authorize.searchParams.set('state', nonce);
