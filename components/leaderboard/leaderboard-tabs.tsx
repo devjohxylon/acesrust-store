@@ -18,26 +18,26 @@ export function LeaderboardTabs({ data }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex rounded-xl border border-border bg-card/40 p-1 gap-1">
+      <div className="inline-flex rounded-lg border border-border bg-card p-1 gap-1">
         <button
           type="button"
           onClick={() => setTab('stats')}
-          className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
             tab === 'stats'
               ? 'bg-primary text-background'
-              : 'text-muted hover:text-white hover:bg-white/5'
+              : 'text-muted hover:text-white'
           }`}
         >
           <Trophy className="w-4 h-4" />
-          In-Game Stats
+          In-Game
         </button>
         <button
           type="button"
           onClick={() => setTab('points')}
-          className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
             tab === 'points'
               ? 'bg-primary text-background'
-              : 'text-muted hover:text-white hover:bg-white/5'
+              : 'text-muted hover:text-white'
           }`}
         >
           <Zap className="w-4 h-4" />

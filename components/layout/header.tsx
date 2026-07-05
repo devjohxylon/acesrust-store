@@ -7,10 +7,16 @@ import { useCart } from '@/hooks/use-cart';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import type { Store } from '@/lib/schemas';
 import { siteConfig } from '@/lib/site';
 import { LoginButton } from '@/components/engagement/login-button';
+
+const NAV = [
+  { href: '/shop', label: 'Shop' },
+  { href: '/leaderboard', label: 'Leaderboard' },
+  { href: '/wipes', label: 'Wipes' },
+  { href: '/community', label: 'Community' },
+] as const;
 
 interface HeaderProps {
   initialStore?: Store | null;
@@ -23,35 +29,22 @@ export function Header({ initialStore }: HeaderProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [prevCount, setPrevCount] = useState(0);
-  const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const cartItemCount = cart.getItemCount();
+  const cartItemCount = mounted ? cart.getItemCount() : 0;
 
-  useEffect(() => {
-    if (mounted && cartItemCount > prevCount) {
-      setAnimate(true);
-      setTimeout(() => setAnimate(false), 600);
-    }
-    setPrevCount(cartItemCount);
-  }, [cartItemCount, mounted, prevCount]);
-
-  const isActive = (path: string) => {
-    if (path === '/') return pathname === '/';
-    return pathname.startsWith(path);
-  };
+  const isActive = (path: string) =>
+    path === '/' ? pathname === '/' : pathname.startsWith(path);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-sm">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 rounded-lg overflow-hidden group-hover:scale-105 transition-transform">
+        <div className="flex h-14 items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2.5 min-w-0">
+            <div className="relative w-8 h-8 rounded-md overflow-hidden shrink-0">
               <Image
                 src={siteConfig.logo}
                 alt={store?.title || siteConfig.name}
@@ -60,181 +53,89 @@ export function Header({ initialStore }: HeaderProps) {
                 unoptimized
               />
             </div>
-            <span className="text-xl font-bold text-white">
+            <span className="text-base font-semibold text-white truncate hidden sm:block">
               {store?.title || siteConfig.name}
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            {isActive('/') ? (
-              <span className="text-sm text-white font-semibold cursor-default">
-                Home
-              </span>
-            ) : (
-              <Link href="/" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
-                Home
+          <nav className="hidden md:flex items-center gap-1">
+            {NAV.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
+                  isActive(href)
+                    ? 'text-white bg-white/5 font-medium'
+                    : 'text-muted hover:text-white'
+                }`}
+              >
+                {label}
               </Link>
-            )}
-            {isActive('/shop') ? (
-              <span className="text-sm text-white font-semibold cursor-default">
-                Shop
-              </span>
-            ) : (
-              <Link href="/shop" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
-                Shop
-              </Link>
-            )}
-            {isActive('/leaderboard') ? (
-              <span className="text-sm text-white font-semibold cursor-default">
-                Leaderboard
-              </span>
-            ) : (
-              <Link href="/leaderboard" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
-                Leaderboard
-              </Link>
-            )}
-            {isActive('/wipes') ? (
-              <span className="text-sm text-white font-semibold cursor-default">
-                Wipes
-              </span>
-            ) : (
-              <Link href="/wipes" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
-                Wipes
-              </Link>
-            )}
-            {isActive('/community') ? (
-              <span className="text-sm text-white font-semibold cursor-default">
-                Community
-              </span>
-            ) : (
-              <Link href="/community" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
-                Community
-              </Link>
-            )}
+            ))}
             {store?.menu_links?.map((menuLink, index) => (
               <a
                 key={index}
                 href={menuLink.link.trim()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-foreground/80 hover:text-foreground transition-colors"
+                className="px-3 py-1.5 rounded-md text-sm text-muted hover:text-white transition-colors"
               >
                 {menuLink.title}
               </a>
             ))}
-            <Link href="/cart" className="relative">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border hover:border-primary transition-colors">
-                <ShoppingCart className="w-5 h-5" />
-                <span className="text-sm font-medium">Cart</span>
-                <AnimatePresence>
-                  {mounted && cartItemCount > 0 && (
-                    <motion.span
-                      key={cartItemCount}
-                      initial={{ scale: 0 }}
-                      animate={{ 
-                        scale: animate ? [1, 1.5, 1] : 1,
-                        rotate: animate ? [0, 10, -10, 0] : 0
-                      }}
-                      exit={{ scale: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary text-background text-xs font-bold flex items-center justify-center glow-primary"
-                    >
-                      {cartItemCount}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </div>
-            </Link>
-            <LoginButton />
           </nav>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/cart"
+              className="relative flex items-center justify-center w-9 h-9 rounded-lg border border-border hover:border-primary/40 transition-colors"
+              aria-label="Cart"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-background text-[10px] font-bold flex items-center justify-center">
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
             <LoginButton />
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 cursor-pointer"
+              className="md:hidden p-2 -mr-2 cursor-pointer"
+              aria-label="Menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <nav className="md:hidden py-4 space-y-2 border-t border-border">
-            <Link 
-              href="/" 
-              className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link 
-              href="/shop" 
-              className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Shop
-            </Link>
-            <Link 
-              href="/leaderboard" 
-              className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Leaderboard
-            </Link>
-            <Link 
-              href="/wipes" 
-              className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Wipes
-            </Link>
-            <Link 
-              href="/community" 
-              className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Community
-            </Link>
+          <nav className="md:hidden py-3 border-t border-border space-y-0.5">
+            {NAV.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`block px-2 py-2.5 rounded-md text-sm ${
+                  isActive(href) ? 'text-white bg-white/5' : 'text-muted'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {label}
+              </Link>
+            ))}
             {store?.menu_links?.map((menuLink, index) => (
               <a
                 key={index}
                 href={menuLink.link.trim()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
+                className="block px-2 py-2.5 text-sm text-muted"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {menuLink.title}
               </a>
             ))}
-            <Link 
-              href="/cart" 
-              className="flex items-center justify-between py-2 text-foreground/80 hover:text-foreground transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <span>Cart</span>
-              <AnimatePresence>
-                {cartItemCount > 0 && (
-                  <motion.span
-                    key={cartItemCount}
-                    initial={{ scale: 0 }}
-                    animate={{ 
-                      scale: animate ? [1, 1.5, 1] : 1,
-                      rotate: animate ? [0, 10, -10, 0] : 0
-                    }}
-                    exit={{ scale: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-6 h-6 rounded-full bg-primary text-background text-xs font-bold flex items-center justify-center"
-                  >
-                    {cartItemCount}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </Link>
           </nav>
         )}
       </div>

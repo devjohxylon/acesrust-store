@@ -29,17 +29,6 @@ function useCountdown(target: string | null) {
   }, [target, now]);
 }
 
-function Unit({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="flex flex-col items-center">
-      <span className="font-mono text-3xl md:text-4xl font-bold text-white tabular-nums text-glow">
-        {String(value).padStart(2, '0')}
-      </span>
-      <span className="text-[10px] uppercase tracking-widest text-muted mt-1">{label}</span>
-    </div>
-  );
-}
-
 export function WipeCountdown() {
   const [wipe, setWipe] = useState<WipeSchedule | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -62,33 +51,28 @@ export function WipeCountdown() {
   if (!loaded || !wipe || !countdown || countdown.done) return null;
 
   return (
-    <section className="py-10 relative">
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto rounded-2xl border border-primary/20 bg-card/60 backdrop-blur p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Calendar className="w-4 h-4 text-primary" />
-                <span className="text-xs uppercase tracking-widest text-primary">Next Wipe</span>
-              </div>
-              <p className="text-xl font-bold text-white">{wipe.title}</p>
-              <span className="inline-block mt-1 text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/20">
-                {WIPE_TYPE_LABELS[wipe.wipeType]}
-              </span>
+    <section className="pb-16">
+      <div className="container mx-auto px-4">
+        <div className="max-w-2xl mx-auto rounded-xl border border-border bg-card/50 px-5 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs uppercase tracking-wide text-muted flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-primary" />
+                Next wipe
+              </p>
+              <p className="font-semibold text-white mt-1 truncate">{wipe.title}</p>
+              <p className="text-xs text-muted mt-0.5">{WIPE_TYPE_LABELS[wipe.wipeType]}</p>
             </div>
-
-            <div className="flex items-center gap-4 md:gap-6">
-              <Unit value={countdown.d} label="days" />
-              <Unit value={countdown.h} label="hrs" />
-              <Unit value={countdown.m} label="min" />
-              <Unit value={countdown.s} label="sec" />
+            <div className="flex items-center gap-3 font-mono text-sm tabular-nums text-white shrink-0">
+              <span>{countdown.d}d</span>
+              <span className="text-muted">:</span>
+              <span>{String(countdown.h).padStart(2, '0')}h</span>
+              <span className="text-muted">:</span>
+              <span>{String(countdown.m).padStart(2, '0')}m</span>
             </div>
           </div>
-          <div className="mt-5 text-right">
-            <Link
-              href="/wipes"
-              className="text-xs text-primary hover:text-primary/80 transition-colors"
-            >
+          <div className="mt-3 pt-3 border-t border-border/60">
+            <Link href="/wipes" className="text-xs text-primary hover:underline">
               Full schedule →
             </Link>
           </div>

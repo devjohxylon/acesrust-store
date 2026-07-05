@@ -17,48 +17,19 @@ export function Footer({ initialStore }: FooterProps) {
   const discordUrl = store?.social_medias?.discord;
 
   return (
-    <footer className="border-t border-border bg-card mt-auto">
-      <div className="container mx-auto px-4 py-5">
-        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-white">
-              {store?.title || siteConfig.name}
-            </p>
-          </div>
+    <footer className="border-t border-border/80 mt-auto">
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <p className="text-xs text-muted">
+            &copy; {currentYear} {store?.title || siteConfig.name}
+          </p>
 
-          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
-            <Link href="/" className="text-muted hover:text-foreground transition-colors">
-              Home
-            </Link>
-            <Link href="/shop" className="text-muted hover:text-foreground transition-colors">
-              Shop
-            </Link>
-            <Link href="/leaderboard" className="text-muted hover:text-foreground transition-colors">
-              Leaderboard
-            </Link>
-            <Link href="/community" className="text-muted hover:text-foreground transition-colors">
-              Community
-            </Link>
-            <Link href="/rewards" className="text-muted hover:text-foreground transition-colors">
-              Rewards
-            </Link>
-            <Link href="/wipes" className="text-muted hover:text-foreground transition-colors">
-              Wipes
-            </Link>
-            <Link href="/cart" className="text-muted hover:text-foreground transition-colors">
-              Cart
-            </Link>
-            {store?.menu_links?.map((menuLink, index) => (
-              <a
-                key={index}
-                href={menuLink.link.trim()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted hover:text-foreground transition-colors"
-              >
-                {menuLink.title}
-              </a>
-            ))}
+          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
+            <Link href="/shop" className="hover:text-foreground transition-colors">Shop</Link>
+            <Link href="/leaderboard" className="hover:text-foreground transition-colors">Leaderboard</Link>
+            <Link href="/community" className="hover:text-foreground transition-colors">Community</Link>
+            <Link href="/wipes" className="hover:text-foreground transition-colors">Wipes</Link>
+            <Link href="/cart" className="hover:text-foreground transition-colors">Cart</Link>
           </nav>
 
           {discordUrl && (
@@ -66,17 +37,13 @@ export function Footer({ initialStore }: FooterProps) {
               href={discordUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#5865F2]/15 border border-[#5865F2]/30 text-[#5865F2] hover:bg-[#5865F2]/25 transition-colors text-xs font-medium shrink-0"
+              className="inline-flex items-center gap-2 text-xs text-[#5865F2] hover:underline shrink-0"
             >
-              <FaDiscord className="w-4 h-4" />
-              Join Our Discord
+              <FaDiscord className="w-3.5 h-3.5" />
+              Discord
             </a>
           )}
         </div>
-
-        <p className="text-xs text-muted text-center md:text-left mt-4 pt-4 border-t border-border/60">
-          &copy; {currentYear} {store?.title || siteConfig.name}
-        </p>
       </div>
     </footer>
   );
