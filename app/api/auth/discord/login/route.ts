@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
-import { discordAuthRedirectUri } from '@/lib/engagement/session';
+import {
+  discordAuthRedirectUri,
+  getDiscordClientId,
+  getDiscordClientSecret,
+} from '@/lib/engagement/discord-oauth';
+import { setOAuthStateCookies } from '@/lib/engagement/session';
 
 export async function GET(request: NextRequest) {
-  const clientId = process.env.DISCORD_CLIENT_ID || process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID;
+  const clientId = getDiscordClientId();
+  const clientSecret = getDiscordClientSecret();
+
   if (!clientId) {
     return NextResponse.redirect(new URL('/?login_error=not_configured', request.nextUrl.origin));
+  }
+  if (!clientSecret) {
+    return NextResponse.redirect(new URL('/?login_error=no_secret', request.nextUrl.origin));
   }
 
   const returnTo = request.nextUrl.searchParams.get('return_to') || '/';
@@ -21,12 +31,6 @@ export async function GET(request: NextRequest) {
   authorize.searchParams.set('state', nonce);
 
   const response = NextResponse.redirect(authorize);
-  response.cookies.set('aces_oauth', `${nonce}:${safeReturn}`, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    maxAge: 600,
-  });
+  setOAuthStateCookies(response, nonce, safeReturn, redirectUri);
   return response;
 }

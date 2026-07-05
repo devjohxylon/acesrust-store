@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { applySessionCookie, discordAuthRedirectUri } from '@/lib/engagement/session';
+import {
+  applySessionCookie,
+  clearOAuthStateCookies,
+} from '@/lib/engagement/session';
+import {
+  classifyDiscordTokenError,
+  getDiscordClientId,
+  getDiscordClientSecret,
+  discordAuthRedirectUri,
+} from '@/lib/engagement/discord-oauth';
 import { isEngagementConfigured } from '@/lib/engagement/db';
 import { upsertProfile } from '@/lib/engagement/service';
 import { safeCompare } from '@/lib/security';
@@ -18,20 +27,28 @@ export async function GET(request: NextRequest) {
 
   if (!code || !state || !stored) return fail(origin, 'missing_code');
 
+  const clientId = getDiscordClientId();
+  const clientSecret = getDiscordClientSecret();
+  if (!clientId) return fail(origin, 'not_configured');
+  if (!clientSecret) return fail(origin, 'no_secret');
+
   const separator = stored.indexOf(':');
   const nonce = separator === -1 ? stored : stored.slice(0, separator);
   const returnTo = separator === -1 ? '/' : stored.slice(separator + 1) || '/';
   if (!safeCompare(nonce, state)) return fail(origin, 'state_mismatch');
 
-  const redirectUri = discordAuthRedirectUri(origin);
+  // Must match the redirect_uri from the authorize step byte-for-byte.
+  const redirectUri =
+    request.cookies.get('aces_oauth_redirect')?.value ??
+    discordAuthRedirectUri(origin);
 
   try {
     const tokenResponse = await fetch(`${DISCORD_API}/oauth2/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_id: process.env.DISCORD_CLIENT_ID || '',
-        client_secret: process.env.DISCORD_CLIENT_SECRET || '',
+        client_id: clientId,
+        client_secret: clientSecret,
         code,
         grant_type: 'authorization_code',
         redirect_uri: redirectUri,
@@ -40,8 +57,14 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const detail = await tokenResponse.text();
-      console.error('Discord token exchange failed:', tokenResponse.status, detail);
-      return fail(origin, 'token_exchange');
+      const errorCode = classifyDiscordTokenError(tokenResponse.status, detail);
+      console.error('Discord token exchange failed:', {
+        status: tokenResponse.status,
+        redirectUri,
+        clientIdSet: Boolean(clientId),
+        detail,
+      });
+      return fail(origin, errorCode);
     }
 
     const { access_token: accessToken } = await tokenResponse.json();
@@ -61,7 +84,6 @@ export async function GET(request: NextRequest) {
       avatar,
     };
 
-    // Profile creation is best-effort — login must succeed even if Supabase is down.
     if (isEngagementConfigured()) {
       try {
         const referredBy = request.cookies.get('aces_ref')?.value ?? null;
@@ -76,7 +98,7 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(landing);
     if (!applySessionCookie(response, user)) return fail(origin, 'no_secret');
 
-    response.cookies.delete('aces_oauth');
+    clearOAuthStateCookies(response);
     response.cookies.delete('aces_ref');
     return response;
   } catch (error) {

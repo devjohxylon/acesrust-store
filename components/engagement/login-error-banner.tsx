@@ -7,15 +7,21 @@ import { AlertCircle } from 'lucide-react';
 
 const MESSAGES: Record<string, string> = {
   not_configured:
-    'Discord login is not configured yet. Add DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET in Vercel.',
+    'Discord login is not configured. In Vercel, set DISCORD_CLIENT_ID and NEXT_PUBLIC_DISCORD_CLIENT_ID (same value).',
   missing_code: 'Login was interrupted. Please try again.',
   state_mismatch:
-    'Login session expired or your site URL changed mid-flow. Use the same domain you bookmarked (e.g. acesrust.com, not www).',
+    'Login session expired. Clear cookies for acesrust.com and try again — always use https://acesrust.com (not www).',
   token_exchange:
-    'Discord rejected the login. In the Discord developer portal, add this redirect URL exactly: https://acesrust.com/api/auth/discord/callback',
+    'Discord rejected the login. Check the redirect URL and client secret below, then redeploy.',
+  token_exchange_redirect:
+    'Redirect URL mismatch. In Discord → OAuth2 → Redirects, add exactly: https://acesrust.com/api/auth/discord/callback (no trailing slash, not /api/oauth/...).',
+  token_exchange_secret:
+    'Wrong Discord client secret. In Vercel, set DISCORD_CLIENT_SECRET to the secret from Discord → OAuth2 (click Reset Secret if unsure), then redeploy.',
+  token_exchange_client:
+    'Discord client ID mismatch. Set DISCORD_CLIENT_ID and NEXT_PUBLIC_DISCORD_CLIENT_ID to the same Application ID, then redeploy.',
   get_user: 'Could not load your Discord profile. Please try again.',
   no_secret:
-    'Server is missing AUTH_SECRET (or DISCORD_CLIENT_SECRET). Add AUTH_SECRET in Vercel and redeploy.',
+    'Missing DISCORD_CLIENT_SECRET or AUTH_SECRET in Vercel. Add them and redeploy.',
   unknown: 'Something went wrong during login. Please try again.',
 };
 

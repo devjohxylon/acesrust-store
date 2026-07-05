@@ -3,20 +3,10 @@ import { createHmac } from 'crypto';
 import type { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { safeCompare } from '@/lib/security';
-import { config } from '@/lib/config';
 import type { SessionUser } from '@/lib/engagement/types';
 
 export const SESSION_COOKIE_NAME = 'aces_session';
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
-
-/** Canonical OAuth callback URL — must match Discord developer portal exactly. */
-export function discordAuthRedirectUri(fallbackOrigin?: string): string {
-  const siteUrl = config.app.siteUrl.replace(/\/$/, '');
-  if (siteUrl && siteUrl.startsWith('http')) {
-    return `${siteUrl}/api/auth/discord/callback`;
-  }
-  return `${fallbackOrigin ?? 'http://localhost:3000'}/api/auth/discord/callback`;
-}
 
 function sessionSecret(): string {
   return process.env.AUTH_SECRET || process.env.DISCORD_CLIENT_SECRET || '';
@@ -47,6 +37,14 @@ export function sessionCookieOptions() {
   };
 }
 
+const OAUTH_COOKIE_OPTS = {
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+  maxAge: 600,
+} as const;
+
 function decodeSession(token: string): SessionUser | null {
   const secret = sessionSecret();
   if (!secret) return null;
@@ -69,15 +67,27 @@ function decodeSession(token: string): SessionUser | null {
   }
 }
 
-/**
- * Attach the session cookie to a redirect response. Required for OAuth callbacks —
- * cookies().set() alone is not reliably included on NextResponse.redirect().
- */
 export function applySessionCookie(response: NextResponse, user: SessionUser): boolean {
   const token = createSessionToken(user);
   if (!token) return false;
   response.cookies.set(SESSION_COOKIE_NAME, token, sessionCookieOptions());
   return true;
+}
+
+/** Persist OAuth state between the authorize redirect and the callback. */
+export function setOAuthStateCookies(
+  response: NextResponse,
+  nonce: string,
+  returnTo: string,
+  redirectUri: string
+) {
+  response.cookies.set('aces_oauth', `${nonce}:${returnTo}`, OAUTH_COOKIE_OPTS);
+  response.cookies.set('aces_oauth_redirect', redirectUri, OAUTH_COOKIE_OPTS);
+}
+
+export function clearOAuthStateCookies(response: NextResponse) {
+  response.cookies.delete('aces_oauth');
+  response.cookies.delete('aces_oauth_redirect');
 }
 
 export async function setUserSession(user: SessionUser): Promise<boolean> {
