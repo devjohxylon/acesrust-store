@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Trophy, Calendar } from 'lucide-react';
+import { ArrowRight, Gift, Trophy } from 'lucide-react';
 import { ServerStatusWidget } from '@/components/server/server-status';
 
 type HeroProps = {
@@ -56,10 +56,10 @@ export function Hero({ title, descriptionHtml }: HeroProps) {
                 <ArrowRight className="w-5 h-5" />
               </button>
             </Link>
-            <Link href="/leaderboard">
+            <Link href="/community">
               <button className="px-8 py-4 rounded-xl border border-primary/30 bg-card/60 backdrop-blur text-white font-semibold text-lg transition-all hover:border-primary/60 hover:scale-105 flex items-center gap-2 justify-center w-full sm:w-auto cursor-pointer">
-                <Trophy className="w-5 h-5 text-primary" />
-                Leaderboard
+                <Gift className="w-5 h-5 text-primary" />
+                Community
               </button>
             </Link>
           </motion.div>
@@ -69,11 +69,11 @@ export function Hero({ title, descriptionHtml }: HeroProps) {
             className="mt-10 flex flex-wrap items-center justify-center gap-3 text-sm"
           >
             <Link
-              href="/wipes"
+              href="/leaderboard"
               className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-2 text-muted hover:text-foreground hover:border-primary/40 transition-colors"
             >
-              <Calendar className="w-4 h-4 text-primary" />
-              Wipe schedule
+              <Trophy className="w-4 h-4 text-primary" />
+              Leaderboard
             </Link>
           </motion.div>
         </motion.div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   Award,
   Calendar,
@@ -205,25 +206,29 @@ export function ProfileView({ discordId }: { discordId: string }) {
           </div>
         </div>
 
-        {/* Achievements */}
-        <div>
-          <h2 className="text-lg font-bold mb-3">Achievements</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            {achievements.map((a) => (
-              <div
-                key={a.id}
-                title={`${a.name} — ${a.description}`}
-                className={`rounded-xl border p-3 text-center transition-colors ${
-                  a.unlocked
-                    ? 'bg-card border-primary/40'
-                    : 'bg-card/40 border-border opacity-40 grayscale'
-                }`}
-              >
-                <p className="text-2xl">{a.icon}</p>
-                <p className="text-[10px] font-medium text-white mt-1 leading-tight">{a.name}</p>
+        {/* Achievements summary */}
+        <div className="rounded-xl border border-border bg-card/40 p-5 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold">Achievements</h2>
+            <p className="text-sm text-muted mt-1">
+              {unlocked.length} of {achievements.length} unlocked
+            </p>
+            {unlocked.length > 0 && (
+              <div className="flex gap-2 mt-3">
+                {unlocked.slice(0, 5).map((a) => (
+                  <span key={a.id} className="text-xl" title={a.name}>
+                    {a.icon}
+                  </span>
+                ))}
               </div>
-            ))}
+            )}
           </div>
+          <Link
+            href="/achievements"
+            className="text-sm text-primary hover:underline whitespace-nowrap shrink-0"
+          >
+            View all →
+          </Link>
         </div>
 
         {/* Referral card (owner only) */}

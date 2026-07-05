@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminSession } from '@/lib/admin-auth';
+import { getWipePrizesState, saveWipePrizesConfig } from '@/lib/cms-service';
+import type { WipePrizesConfig } from '@/lib/cms-types';
 import { isEngagementConfigured } from '@/lib/engagement/db';
 import {
   createChallenge,
@@ -10,6 +12,7 @@ import {
   resolveRedemption,
   updateChallenge,
 } from '@/lib/engagement/service';
+import { announceLatestPendingWipe, announceWipeWinners } from '@/lib/engagement/wipe-prizes';
 import type { ChallengeType } from '@/lib/engagement/types';
 
 const CHALLENGE_TYPES: ChallengeType[] = ['checkin_days', 'purchases', 'points_earned'];
@@ -44,6 +47,27 @@ function parseChallenge(body: Record<string, unknown>) {
   };
 }
 
+function parseWipePrizesConfig(body: Record<string, unknown>): WipePrizesConfig | null {
+  const place = (value: unknown) => {
+    if (!value || typeof value !== 'object') return null;
+    const row = value as Record<string, unknown>;
+    if (typeof row.title !== 'string' || typeof row.description !== 'string') return null;
+    return { title: row.title.trim(), description: row.description.trim() };
+  };
+
+  const first = place(body.first);
+  const second = place(body.second);
+  const third = place(body.third);
+  if (!first || !second || !third) return null;
+
+  return {
+    enabled: Boolean(body.enabled),
+    first,
+    second,
+    third,
+  };
+}
+
 export async function GET() {
   try {
     await requireAdminSession();
@@ -52,15 +76,21 @@ export async function GET() {
   }
 
   if (!isEngagementConfigured()) {
-    return NextResponse.json({ configured: false, challenges: [], redemptions: [] });
+    return NextResponse.json({
+      configured: false,
+      challenges: [],
+      redemptions: [],
+      wipePrizes: null,
+    });
   }
 
   try {
-    const [challenges, redemptions] = await Promise.all([
+    const [challenges, redemptions, wipePrizes] = await Promise.all([
       listAllChallenges(),
       listRedemptions(),
+      getWipePrizesState().catch(() => null),
     ]);
-    return NextResponse.json({ configured: true, challenges, redemptions });
+    return NextResponse.json({ configured: true, challenges, redemptions, wipePrizes });
   } catch (error) {
     console.error('Failed to load engagement admin data:', error);
     return NextResponse.json({ error: 'Failed to load data' }, { status: 500 });
@@ -132,6 +162,23 @@ export async function POST(request: NextRequest) {
         }
         const balance = await grantPoints(body.discordId, amount, body.description);
         return NextResponse.json({ balance });
+      }
+      case 'save_wipe_prizes': {
+        const config = parseWipePrizesConfig(body);
+        if (!config) return NextResponse.json({ error: 'Invalid prize config' }, { status: 400 });
+        const wipePrizes = await saveWipePrizesConfig(config);
+        return NextResponse.json({ wipePrizes });
+      }
+      case 'announce_wipe_winners': {
+        if (typeof body.wipeId === 'string' && body.wipeId.trim()) {
+          const snapshot = await announceWipeWinners(body.wipeId.trim());
+          return NextResponse.json({ snapshot });
+        }
+        const snapshot = await announceLatestPendingWipe();
+        if (!snapshot) {
+          return NextResponse.json({ error: 'No pending wipe to announce' }, { status: 404 });
+        }
+        return NextResponse.json({ snapshot });
       }
       default:
         return NextResponse.json({ error: 'Unknown action' }, { status: 400 });

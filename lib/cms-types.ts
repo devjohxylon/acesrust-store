@@ -88,3 +88,57 @@ export type PopPoint = {
 
 export const MAX_PURCHASES = 20;
 export const MAX_POP_POINTS = 500;
+
+export type WipePrizePlace = {
+  title: string;
+  description: string;
+};
+
+export type WipePrizesConfig = {
+  enabled: boolean;
+  first: WipePrizePlace;
+  second: WipePrizePlace;
+  third: WipePrizePlace;
+};
+
+export type WipePrizeWinner = {
+  place: 1 | 2 | 3;
+  discord_id: string;
+  username: string;
+  points: number;
+};
+
+export type WipePrizeWinnerSnapshot = {
+  wipeId: string;
+  wipeTitle: string;
+  announcedAt: string;
+  winners: WipePrizeWinner[];
+};
+
+export type WipePrizesState = {
+  config: WipePrizesConfig;
+  announcedWipeIds: string[];
+  lastWinners: WipePrizeWinnerSnapshot | null;
+};
+
+export const DEFAULT_WIPE_PRIZES: WipePrizesConfig = {
+  enabled: true,
+  first: {
+    title: 'Grand Prize',
+    description: 'Exclusive VIP kit + Site Legend Discord role',
+  },
+  second: {
+    title: 'Runner-Up',
+    description: 'Premium shop kit of your choice',
+  },
+  third: {
+    title: 'Third Place',
+    description: '500 bonus points + 10% shop discount',
+  },
+};
+
+export const DEFAULT_WIPE_PRIZES_STATE: WipePrizesState = {
+  config: DEFAULT_WIPE_PRIZES,
+  announcedWipeIds: [],
+  lastWinners: null,
+};

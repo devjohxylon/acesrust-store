@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Award, Flame, Gift, LogOut, User } from 'lucide-react';
+import { Award, Flame, Gift, LogOut, User, Users } from 'lucide-react';
 import { FaDiscord } from 'react-icons/fa';
 import { useLogout, useMe } from '@/hooks/use-engagement';
 import { isValidAvatarUrl } from '@/lib/engagement/avatar';
@@ -114,6 +114,14 @@ export function LoginButton() {
               >
                 <Award className="w-4 h-4" />
                 Achievements
+              </Link>
+              <Link
+                href="/community"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-white/5 transition-colors"
+              >
+                <Users className="w-4 h-4" />
+                Community
               </Link>
               <Link
                 href="/rewards"

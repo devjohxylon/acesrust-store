@@ -36,6 +36,12 @@ export function Footer({ initialStore }: FooterProps) {
             <Link href="/leaderboard" className="text-muted hover:text-foreground transition-colors">
               Leaderboard
             </Link>
+            <Link href="/community" className="text-muted hover:text-foreground transition-colors">
+              Community
+            </Link>
+            <Link href="/rewards" className="text-muted hover:text-foreground transition-colors">
+              Rewards
+            </Link>
             <Link href="/wipes" className="text-muted hover:text-foreground transition-colors">
               Wipes
             </Link>

@@ -13,10 +13,16 @@ export function PointsRace() {
   const { data: me } = useMe();
 
   const board = data?.leaderboard;
-  if (!board || board.top.length === 0) return null;
-
   const myId = me?.user?.id;
-  const inTop = Boolean(myId && board.top.some((e) => e.discord_id === myId));
+  const inTop = Boolean(myId && board?.top.some((e) => e.discord_id === myId));
+
+  if (!board) {
+    return (
+      <div className="rounded-2xl border border-border bg-card/40 px-5 py-8 text-center text-sm text-muted">
+        Points race unavailable — login with Discord to compete.
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl border border-border bg-card/60 backdrop-blur overflow-hidden">
@@ -35,43 +41,49 @@ export function PointsRace() {
         </Link>
       </div>
 
-      <div className="divide-y divide-border">
-        {board.top.map((entry) => {
-          const isMe = entry.discord_id === myId;
-          return (
-            <Link
-              key={entry.discord_id}
-              href={`/profile/${entry.discord_id}`}
-              className={`flex items-center gap-3 px-5 py-2.5 hover:bg-white/5 transition-colors ${
-                isMe ? 'bg-primary/10' : ''
-              }`}
-            >
-              <span className="w-8 text-center shrink-0">
-                {entry.rank <= 3 ? (
-                  <span className="text-lg">{MEDALS[entry.rank - 1]}</span>
-                ) : (
-                  <span className="text-sm text-muted font-medium">{entry.rank}</span>
-                )}
-              </span>
-              <span className="relative w-8 h-8 rounded-full overflow-hidden bg-border shrink-0">
-                {isValidAvatarUrl(entry.avatar) ? (
-                  <Image src={entry.avatar} alt={entry.username} fill className="object-cover" unoptimized />
-                ) : (
-                  <User className="w-4 h-4 absolute inset-0 m-auto text-muted" />
-                )}
-              </span>
-              <span className="text-sm font-medium text-white truncate flex-1 flex items-center gap-1.5">
-                {entry.username}
-                {entry.rank === 1 && <Crown className="w-3.5 h-3.5 text-yellow-400" />}
-                {isMe && <span className="text-[10px] text-primary font-bold">(you)</span>}
-              </span>
-              <span className="text-sm font-bold text-primary whitespace-nowrap">
-                {entry.points.toLocaleString()} pts
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      {board.top.length === 0 ? (
+        <div className="px-5 py-8 text-center text-sm text-muted">
+          No one on the board yet. Check in daily or shop to earn points and claim first place.
+        </div>
+      ) : (
+        <div className="divide-y divide-border">
+          {board.top.map((entry) => {
+            const isMe = entry.discord_id === myId;
+            return (
+              <Link
+                key={entry.discord_id}
+                href={`/profile/${entry.discord_id}`}
+                className={`flex items-center gap-3 px-5 py-2.5 hover:bg-white/5 transition-colors ${
+                  isMe ? 'bg-primary/10' : ''
+                }`}
+              >
+                <span className="w-8 text-center shrink-0">
+                  {entry.rank <= 3 ? (
+                    <span className="text-lg">{MEDALS[entry.rank - 1]}</span>
+                  ) : (
+                    <span className="text-sm text-muted font-medium">{entry.rank}</span>
+                  )}
+                </span>
+                <span className="relative w-8 h-8 rounded-full overflow-hidden bg-border shrink-0">
+                  {isValidAvatarUrl(entry.avatar) ? (
+                    <Image src={entry.avatar} alt={entry.username} fill className="object-cover" unoptimized />
+                  ) : (
+                    <User className="w-4 h-4 absolute inset-0 m-auto text-muted" />
+                  )}
+                </span>
+                <span className="text-sm font-medium text-white truncate flex-1 flex items-center gap-1.5">
+                  {entry.username}
+                  {entry.rank === 1 && <Crown className="w-3.5 h-3.5 text-yellow-400" />}
+                  {isMe && <span className="text-[10px] text-primary font-bold">(you)</span>}
+                </span>
+                <span className="text-sm font-bold text-primary whitespace-nowrap">
+                  {entry.points.toLocaleString()} pts
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
 
       {board.me && !inTop && (
         <div className="px-5 py-2.5 border-t border-border bg-primary/5 flex items-center gap-3">

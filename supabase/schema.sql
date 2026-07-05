@@ -138,6 +138,26 @@ as $$
   limit p_limit;
 $$;
 
+-- Closed season window (e.g. between two wipes) for wipe prize winners.
+create or replace function season_points_leaderboard_between(
+  p_since timestamptz,
+  p_until timestamptz,
+  p_limit integer default 3
+) returns table (discord_id text, username text, avatar text, points bigint)
+language sql
+security definer
+as $$
+  select p.discord_id, p.username, p.avatar, sum(t.amount)::bigint as points
+  from point_transactions t
+  join engagement_profiles p on p.discord_id = t.discord_id
+  where t.created_at >= p_since
+    and t.created_at < p_until
+    and t.amount > 0
+  group by p.discord_id, p.username, p.avatar
+  order by points desc
+  limit p_limit;
+$$;
+
 -- Migration for databases created before the Discord integration.
 alter table engagement_profiles
   add column if not exists dm_reminders boolean not null default false;

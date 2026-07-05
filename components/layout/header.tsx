@@ -103,13 +103,13 @@ export function Header({ initialStore }: HeaderProps) {
                 Wipes
               </Link>
             )}
-            {isActive('/rewards') ? (
+            {isActive('/community') ? (
               <span className="text-sm text-white font-semibold cursor-default">
-                Rewards
+                Community
               </span>
             ) : (
-              <Link href="/rewards" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
-                Rewards
+              <Link href="/community" className="text-sm text-foreground/80 hover:text-foreground transition-colors">
+                Community
               </Link>
             )}
             {store?.menu_links?.map((menuLink, index) => (
@@ -193,11 +193,11 @@ export function Header({ initialStore }: HeaderProps) {
               Wipes
             </Link>
             <Link 
-              href="/rewards" 
+              href="/community" 
               className="block py-2 text-foreground/80 hover:text-foreground transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Rewards
+              Community
             </Link>
             {store?.menu_links?.map((menuLink, index) => (
               <a

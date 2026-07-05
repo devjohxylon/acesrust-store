@@ -1,0 +1,58 @@
+'use client';
+
+import { useState } from 'react';
+import { Trophy, Zap } from 'lucide-react';
+import type { LeaderboardData } from '@/lib/leaderboard-data';
+import { LeaderboardBoard } from '@/components/leaderboard/leaderboard-board';
+import { PointsRace } from '@/components/engagement/points-race';
+import { PopGraph } from '@/components/server/pop-graph';
+
+type Tab = 'stats' | 'points';
+
+type Props = {
+  data: LeaderboardData;
+};
+
+export function LeaderboardTabs({ data }: Props) {
+  const [tab, setTab] = useState<Tab>('stats');
+
+  return (
+    <div className="space-y-6">
+      <div className="flex rounded-xl border border-border bg-card/40 p-1 gap-1">
+        <button
+          type="button"
+          onClick={() => setTab('stats')}
+          className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+            tab === 'stats'
+              ? 'bg-primary text-background'
+              : 'text-muted hover:text-white hover:bg-white/5'
+          }`}
+        >
+          <Trophy className="w-4 h-4" />
+          In-Game Stats
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab('points')}
+          className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+            tab === 'points'
+              ? 'bg-primary text-background'
+              : 'text-muted hover:text-white hover:bg-white/5'
+          }`}
+        >
+          <Zap className="w-4 h-4" />
+          Points Race
+        </button>
+      </div>
+
+      {tab === 'stats' ? (
+        <div className="space-y-8">
+          <LeaderboardBoard data={data} />
+          <PopGraph />
+        </div>
+      ) : (
+        <PointsRace />
+      )}
+    </div>
+  );
+}

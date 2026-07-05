@@ -491,6 +491,14 @@ async function seasonStart(now: Date): Promise<{ start: Date; label: string }> {
   return { start: monthStart, label: 'This Month' };
 }
 
+function rankSeasonRows(rows: Omit<SeasonLeaderboardEntry, 'rank'>[]): SeasonLeaderboardEntry[] {
+  return rows.map((row, index) => ({
+    ...row,
+    points: Number(row.points),
+    rank: index + 1,
+  }));
+}
+
 export async function getSeasonLeaderboard(
   discordId: string | null
 ): Promise<SeasonLeaderboard> {
@@ -503,17 +511,35 @@ export async function getSeasonLeaderboard(
   });
   if (error) throw new Error(error.message);
 
-  const rows = (data ?? []) as Omit<SeasonLeaderboardEntry, 'rank'>[];
-  const ranked = rows.map((row, index) => ({
-    ...row,
-    points: Number(row.points),
-    rank: index + 1,
-  }));
+  const ranked = rankSeasonRows((data ?? []) as Omit<SeasonLeaderboardEntry, 'rank'>[]);
 
   return {
     seasonStart: start.toISOString(),
     seasonLabel: label,
     top: ranked.slice(0, 10),
+    me: discordId ? (ranked.find((r) => r.discord_id === discordId) ?? null) : null,
+  };
+}
+
+export async function getSeasonLeaderboardBetween(
+  since: Date,
+  until: Date,
+  discordId: string | null,
+  limit = 3
+): Promise<SeasonLeaderboard> {
+  const { data, error } = await engagementDb().rpc('season_points_leaderboard_between', {
+    p_since: since.toISOString(),
+    p_until: until.toISOString(),
+    p_limit: limit,
+  });
+  if (error) throw new Error(error.message);
+
+  const ranked = rankSeasonRows((data ?? []) as Omit<SeasonLeaderboardEntry, 'rank'>[]);
+
+  return {
+    seasonStart: since.toISOString(),
+    seasonLabel: `${since.toISOString().slice(0, 10)} → ${until.toISOString().slice(0, 10)}`,
+    top: ranked,
     me: discordId ? (ranked.find((r) => r.discord_id === discordId) ?? null) : null,
   };
 }

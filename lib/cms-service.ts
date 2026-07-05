@@ -8,6 +8,8 @@ import {
   type PurchaseInput,
   type ServerStatus,
   type ServerStatusInput,
+  type WipePrizesConfig,
+  type WipePrizesState,
   type WipeSchedule,
   type WipeScheduleInput,
 } from '@/lib/cms-types';
@@ -153,4 +155,49 @@ export async function getPopHistory(hours = 24): Promise<PopPoint[]> {
   const { popHistory } = await readCmsData();
   const cutoff = Date.now() - hours * 60 * 60 * 1000;
   return (popHistory ?? []).filter((point) => new Date(point.t).getTime() >= cutoff);
+}
+
+export async function getWipePrizesState(): Promise<WipePrizesState> {
+  const { wipePrizes } = await readCmsData();
+  return wipePrizes;
+}
+
+export async function saveWipePrizesConfig(config: WipePrizesConfig): Promise<WipePrizesState> {
+  const data = await readCmsData();
+  data.wipePrizes = {
+    ...data.wipePrizes,
+    config: {
+      enabled: Boolean(config.enabled),
+      first: {
+        title: config.first.title.trim(),
+        description: config.first.description.trim(),
+      },
+      second: {
+        title: config.second.title.trim(),
+        description: config.second.description.trim(),
+      },
+      third: {
+        title: config.third.title.trim(),
+        description: config.third.description.trim(),
+      },
+    },
+  };
+  await writeCmsData(data);
+  return data.wipePrizes;
+}
+
+export async function markWipePrizesAnnounced(
+  wipeId: string,
+  snapshot: WipePrizesState['lastWinners']
+): Promise<WipePrizesState> {
+  const data = await readCmsData();
+  const announced = new Set(data.wipePrizes.announcedWipeIds);
+  announced.add(wipeId);
+  data.wipePrizes = {
+    ...data.wipePrizes,
+    announcedWipeIds: [...announced],
+    lastWinners: snapshot,
+  };
+  await writeCmsData(data);
+  return data.wipePrizes;
 }

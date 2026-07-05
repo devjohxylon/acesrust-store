@@ -4,9 +4,11 @@ import { get, put } from '@vercel/blob';
 import { placeholderLeaderboard, type LeaderboardData } from '@/lib/leaderboard-data';
 import {
   EMPTY_SERVER_STATUS,
+  DEFAULT_WIPE_PRIZES_STATE,
   type PopPoint,
   type PurchaseEntry,
   type ServerStatus,
+  type WipePrizesState,
   type WipeSchedule,
 } from '@/lib/cms-types';
 import { getCmsBackend } from '@/lib/cms-config';
@@ -17,6 +19,7 @@ export type CmsData = {
   server: ServerStatus;
   purchases: PurchaseEntry[];
   popHistory: PopPoint[];
+  wipePrizes: WipePrizesState;
 };
 
 function defaultData(): CmsData {
@@ -26,6 +29,7 @@ function defaultData(): CmsData {
     server: EMPTY_SERVER_STATUS,
     purchases: [],
     popHistory: [],
+    wipePrizes: DEFAULT_WIPE_PRIZES_STATE,
   };
 }
 
@@ -78,6 +82,7 @@ function normalize(data: CmsData | null): CmsData {
     server: data.server ?? base.server,
     purchases: data.purchases ?? base.purchases,
     popHistory: data.popHistory ?? base.popHistory,
+    wipePrizes: data.wipePrizes ?? base.wipePrizes,
   };
 }
 
