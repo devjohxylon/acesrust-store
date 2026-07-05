@@ -7,6 +7,7 @@ import { Package, Filter, AlertCircle, RefreshCcw, Loader2, Search } from 'lucid
 import Image from 'next/image';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Category } from '@/lib/schemas';
+import { PointsRewardsSection } from '@/components/engagement/points-rewards-section';
 
 export default function ShopPage() {
   const cart = useCart();
@@ -192,6 +193,8 @@ export default function ShopPage() {
             />
           </div>
         </div>
+
+        <PointsRewardsSection variant="shop" />
 
         {/* Category Filters */}
 

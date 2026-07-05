@@ -144,7 +144,8 @@ export function ProductCard({ product, hideFeaturedBadge = false }: ProductCardP
             {/* Price & CTA */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-baseline gap-2">
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex items-baseline gap-2 flex-wrap">
                   <span className="text-2xl font-bold text-primary">
                     {product.price > 0 ? `$${product.price.toFixed(2)}` : 'Free'}
                   </span>
@@ -176,6 +177,12 @@ export function ProductCard({ product, hideFeaturedBadge = false }: ProductCardP
                         </span>
                       ) : null}
                     </>
+                  )}
+                  </div>
+                  {product.price > 0 && (
+                    <p className="text-[11px] text-primary/90 font-medium">
+                      +{Math.max(1, Math.round(product.price * 5))} pts when you buy
+                    </p>
                   )}
                 </div>
 
