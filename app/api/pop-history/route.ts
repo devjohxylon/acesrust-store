@@ -1,13 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPopHistory } from '@/lib/cms-service';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const hours = Math.min(168, Math.max(1, Number(request.nextUrl.searchParams.get('hours')) || 24));
+
   try {
-    const points = await getPopHistory(24);
+    const points = await getPopHistory(hours);
     return NextResponse.json(
-      { points },
+      { points, hours },
       { headers: { 'Cache-Control': 'public, max-age=60' } }
     );
   } catch {

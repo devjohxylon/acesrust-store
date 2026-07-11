@@ -87,6 +87,90 @@ body {
   background: radial-gradient(ellipse 90% 80% at 50% 40%, transparent 50%, rgba(0, 0, 0, 0.45) 100%);
 }
 
+.fx-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(255, 23, 68, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 23, 68, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent);
+}
+
+.fx-aurora-1 {
+  width: 50vw;
+  height: 50vw;
+  top: -18vw;
+  left: -12vw;
+  background: radial-gradient(circle, rgba(200, 20, 55, 0.22), transparent 70%);
+  animation: fx-float-1 22s ease-in-out infinite;
+}
+
+.fx-aurora-2 {
+  width: 42vw;
+  height: 42vw;
+  bottom: -20vw;
+  right: -10vw;
+  background: radial-gradient(circle, rgba(150, 10, 40, 0.18), transparent 70%);
+  animation: fx-float-2 28s ease-in-out infinite;
+}
+
+.panel-glow {
+  box-shadow:
+    0 0 0 1px rgba(255, 23, 68, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 0 48px rgba(255, 23, 68, 0.06);
+}
+
+.btn-primary-glow {
+  box-shadow: 0 0 24px rgba(255, 23, 68, 0.35);
+}
+
+.btn-primary-glow:hover {
+  box-shadow: 0 0 32px rgba(255, 23, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+.chart-stroke-in {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: chart-draw 1.4s ease-out forwards;
+}
+
+.chart-area-in {
+  animation: chart-fade 1s ease-out forwards;
+}
+
+.bar-peak {
+  animation: bar-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes chart-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes chart-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bar-pulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.25); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-aurora,
+  .fx-ember,
+  .chart-stroke-in,
+  .chart-area-in,
+  .bar-peak {
+    animation: none !important;
+  }
+  .chart-stroke-in { stroke-dashoffset: 0; }
+}
+
 /* Legacy animated classes kept for reference but unused */
 .fx-aurora {
   position: absolute;
@@ -96,20 +180,7 @@ body {
   will-change: transform;
 }
 
-.fx-aurora-1 {
-  width: 46vw; height: 46vw;
-  top: -14vw; left: -10vw;
-  background: radial-gradient(circle, rgba(200, 20, 55, 0.32), transparent 68%);
-  animation: fx-float-1 18s ease-in-out infinite;
-}
-
-.fx-aurora-2 {
-  width: 40vw; height: 40vw;
-  bottom: -16vw; right: -8vw;
-  background: radial-gradient(circle, rgba(150, 10, 40, 0.28), transparent 68%);
-  animation: fx-float-2 22s ease-in-out infinite;
-}
-
+/* Legacy — aurora-3 unused */
 .fx-aurora-3 {
   width: 34vw; height: 34vw;
   top: 32%; left: 55%;

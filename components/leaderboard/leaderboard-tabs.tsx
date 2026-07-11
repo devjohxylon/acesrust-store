@@ -5,7 +5,7 @@ import { Trophy, Zap } from 'lucide-react';
 import type { LeaderboardData } from '@/lib/leaderboard-data';
 import { LeaderboardBoard } from '@/components/leaderboard/leaderboard-board';
 import { PointsRace } from '@/components/engagement/points-race';
-import { PopGraph } from '@/components/server/pop-graph';
+import { ServerActivityPanel } from '@/components/server/server-activity-panel';
 
 type Tab = 'stats' | 'points';
 
@@ -48,7 +48,7 @@ export function LeaderboardTabs({ data }: Props) {
       {tab === 'stats' ? (
         <div className="space-y-8">
           <LeaderboardBoard data={data} />
-          <PopGraph />
+          <ServerActivityPanel variant="full" />
         </div>
       ) : (
         <PointsRace />
