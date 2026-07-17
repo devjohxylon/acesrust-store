@@ -140,7 +140,7 @@ export function LeaderboardEditor() {
   }
 
   if (!data) {
-    return <p className="text-sm text-primary">{error || 'Leaderboard unavailable.'}</p>;
+    return <p className="text-sm text-red-400">{error || 'Leaderboard unavailable.'}</p>;
   }
 
   return (
@@ -165,7 +165,7 @@ export function LeaderboardEditor() {
       </div>
 
       {message && <p className="text-sm text-green-400">{message}</p>}
-      {error && <p className="text-sm text-primary">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
 
       {data.kaosImageUrl ? (
         <div className="rounded-xl border border-sky-500/30 bg-sky-500/10 p-4 space-y-3">

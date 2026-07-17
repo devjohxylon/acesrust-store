@@ -78,7 +78,7 @@ export function AdminLoginForm({ authMode }: { authMode: AdminAuthMode }) {
               className="w-full px-3 py-2.5 rounded-lg bg-background border border-border text-sm focus:outline-none focus:border-primary"
             />
           </div>
-          {error && <p className="text-sm text-primary">{error}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
           <button
             type="submit"
             disabled={loading}

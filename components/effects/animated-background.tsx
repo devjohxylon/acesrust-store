@@ -2,20 +2,21 @@
 
 import { useMemo } from 'react';
 
-const EMBER_COUNT = 10;
+const STAR_COUNT = 28;
 
 export function AnimatedBackground() {
-  const embers = useMemo(
+  const stars = useMemo(
     () =>
-      Array.from({ length: EMBER_COUNT }).map((_, i) => {
+      Array.from({ length: STAR_COUNT }).map((_, i) => {
         const seed = (i * 9301 + 49297) % 233280;
         const rand = seed / 233280;
         const rand2 = ((i * 4099 + 7919) % 233280) / 233280;
         return {
           left: `${Math.round(rand * 100)}%`,
-          delay: `${(rand2 * 14).toFixed(2)}s`,
-          duration: `${(12 + rand * 14).toFixed(2)}s`,
-          drift: `${Math.round((rand2 - 0.5) * 80)}px`,
+          top: `${Math.round(rand2 * 100)}%`,
+          delay: `${(rand2 * 6).toFixed(2)}s`,
+          duration: `${(3 + rand * 5).toFixed(2)}s`,
+          scale: 0.5 + rand2 * 1.2,
         };
       }),
     []
@@ -26,18 +27,17 @@ export function AnimatedBackground() {
       <div className="fx-static-bg" />
       <div className="fx-aurora fx-aurora-1" />
       <div className="fx-aurora fx-aurora-2" />
-      {embers.map((e, i) => (
+      {stars.map((s, i) => (
         <span
           key={i}
-          className="fx-ember"
-          style={
-            {
-              left: e.left,
-              animationDelay: e.delay,
-              animationDuration: e.duration,
-              '--ember-drift': e.drift,
-            } as React.CSSProperties
-          }
+          className="fx-star"
+          style={{
+            left: s.left,
+            top: s.top,
+            animationDelay: s.delay,
+            animationDuration: s.duration,
+            transform: `scale(${s.scale})`,
+          }}
         />
       ))}
       <div className="fx-grid" />

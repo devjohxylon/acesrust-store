@@ -1,6 +1,6 @@
 import { PointsRewardsSection } from '@/components/engagement/points-rewards-section';
 
-export const metadata = { title: 'Rewards — Aces Vanilla+' };
+export const metadata = { title: 'Rewards — Astral Vanilla+' };
 
 export default function RewardsPage() {
   return (

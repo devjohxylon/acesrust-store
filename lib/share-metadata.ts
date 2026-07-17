@@ -1,5 +1,5 @@
 export const shareMetadata = {
-  title: 'Aces Vanilla+ RCE',
+  title: 'Astral Vanilla+ RCE',
   description:
-    'Official store for Aces Vanilla+ -- Thank you for supporting the community!',
+    'Official store for Astral Vanilla+ — thank you for supporting the community!',
 } as const;

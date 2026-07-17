@@ -47,14 +47,14 @@ export function Header({ initialStore }: HeaderProps) {
             <div className="relative w-8 h-8 rounded-md overflow-hidden shrink-0">
               <Image
                 src={siteConfig.logo}
-                alt={store?.title || siteConfig.name}
+                alt={siteConfig.name}
                 fill
                 className="object-contain"
                 unoptimized
               />
             </div>
             <span className="text-base font-semibold text-white truncate hidden sm:block">
-              {store?.title || siteConfig.name}
+              {siteConfig.name}
             </span>
           </Link>
 

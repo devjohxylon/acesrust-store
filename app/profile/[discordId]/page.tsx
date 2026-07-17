@@ -1,6 +1,6 @@
 import { ProfileView } from '@/components/engagement/profile-view';
 
-export const metadata = { title: 'Player Profile — Aces Vanilla+' };
+export const metadata = { title: 'Player Profile — Astral Vanilla+' };
 
 export default async function ProfilePage({
   params,

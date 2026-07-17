@@ -16,7 +16,7 @@ export const REWARDS: RewardDefinition[] = [
   {
     id: 'discord_legend',
     name: 'Site Legend Discord Role',
-    description: 'The exclusive Site Legend role on the Aces Vanilla+ Discord.',
+    description: 'The exclusive Site Legend role on the Astral Vanilla+ Discord.',
     cost: 1500,
   },
 ];

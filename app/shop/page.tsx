@@ -9,10 +9,11 @@ import { Package, Filter, AlertCircle, RefreshCcw, Loader2, Search } from 'lucid
 import Image from 'next/image';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Category } from '@/lib/schemas';
+import { siteConfig } from '@/lib/site';
 
 export default function ShopPage() {
   const cart = useCart();
-  const { data: store } = useStore();
+  useStore();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -141,7 +142,7 @@ export default function ShopPage() {
   return (
     <PageShell
       title="Shop"
-      description={store?.title ? `Official store for ${store.title}` : 'Browse kits and VIP packages'}
+      description={`Official store for ${siteConfig.name}`}
       width="xl"
     >
       <PointsBanner />

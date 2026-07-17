@@ -175,7 +175,7 @@ export function EngagementEditor() {
       </div>
 
       {message && <p className="text-sm text-green-400">{message}</p>}
-      {error && <p className="text-sm text-primary">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
 
       {/* Pending redemptions */}
       <div className="space-y-3">

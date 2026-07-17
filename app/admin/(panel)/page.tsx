@@ -7,7 +7,7 @@ export default function AdminDashboardPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
         <p className="text-sm text-muted mt-1">
-          Manage public site content for Aces Vanilla+.
+          Manage public site content for Astral Vanilla+.
         </p>
       </div>
 

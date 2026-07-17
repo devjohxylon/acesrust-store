@@ -14,6 +14,7 @@ function isStaticAsset(pathname: string) {
 function isShareMetadataPath(pathname: string) {
   return (
     pathname === '/aces-logo.png' ||
+    pathname === '/astral-logo.png' ||
     pathname === '/twitter-image' ||
     pathname.startsWith('/twitter-image/')
   );

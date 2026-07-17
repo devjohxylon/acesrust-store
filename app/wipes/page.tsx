@@ -6,7 +6,7 @@ import { siteConfig } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: `Wipe Schedule | ${siteConfig.name}`,
-  description: 'Upcoming map, blueprint, and full wipes for Aces Vanilla+.',
+  description: 'Upcoming map, blueprint, and full wipes for Astral Vanilla+.',
 };
 
 export const revalidate = 60;

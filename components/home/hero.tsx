@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { ServerStatusWidget } from '@/components/server/server-status';
+import { siteConfig } from '@/lib/site';
 
 type HeroProps = {
   title: string;
@@ -32,6 +34,19 @@ export function Hero({ title, descriptionHtml }: HeroProps) {
           animate="show"
           className="max-w-2xl mx-auto text-center"
         >
+          <motion.div variants={item} className="flex justify-center mb-6">
+            <div className="relative w-24 h-24 md:w-28 md:h-28">
+              <Image
+                src={siteConfig.logo}
+                alt={title}
+                fill
+                className="object-contain drop-shadow-[0_0_28px_rgba(200,204,214,0.35)]"
+                priority
+                unoptimized
+              />
+            </div>
+          </motion.div>
+
           <motion.div variants={item} className="flex justify-center mb-5">
             <ServerStatusWidget variant="pill" />
           </motion.div>

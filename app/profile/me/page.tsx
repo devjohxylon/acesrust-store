@@ -4,7 +4,7 @@ import { isEngagementConfigured } from '@/lib/engagement/db';
 import { getProfile, upsertProfile } from '@/lib/engagement/service';
 import { ProfileView } from '@/components/engagement/profile-view';
 
-export const metadata = { title: 'My Profile — Aces Vanilla+' };
+export const metadata = { title: 'My Profile — Astral Vanilla+' };
 
 export default async function MyProfilePage() {
   const user = await getUserSession();

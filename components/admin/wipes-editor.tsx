@@ -131,7 +131,7 @@ export function WipesEditor() {
       </div>
 
       {message && <p className="text-sm text-green-400">{message}</p>}
-      {error && <p className="text-sm text-primary">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
 
       <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-card p-5 space-y-4">
         <div className="flex items-center justify-between">

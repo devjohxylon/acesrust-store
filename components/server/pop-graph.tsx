@@ -84,15 +84,15 @@ export function PopGraph() {
       >
         <defs>
           <linearGradient id="popFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgb(255,23,68)" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="rgb(255,23,68)" stopOpacity="0" />
+            <stop offset="0%" stopColor="rgb(200,204,214)" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="rgb(200,204,214)" stopOpacity="0" />
           </linearGradient>
         </defs>
         <path d={area} fill="url(#popFill)" />
         <path
           d={line}
           fill="none"
-          stroke="rgb(255,23,68)"
+          stroke="rgb(200,204,214)"
           strokeWidth="2"
           strokeLinejoin="round"
           strokeLinecap="round"

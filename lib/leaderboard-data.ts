@@ -20,7 +20,7 @@ export type LeaderboardData = {
 
 /** Placeholder data — replace with live KAOS feed when available */
 export const placeholderLeaderboard: LeaderboardData = {
-  serverName: '[S] 1 | Aces Vanilla+',
+  serverName: '[S] 1 | Astral Vanilla+',
   totalKills: 564,
   updatedAt: '2026-06-28 15:39:24 UTC',
   topKillers: [

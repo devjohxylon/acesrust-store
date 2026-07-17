@@ -19,7 +19,7 @@ export async function LeaderboardSection({ showViewAll = true }: LeaderboardSect
               Server Leaderboard
             </h2>
             <p className="text-muted max-w-xl mx-auto">
-              Top killers, survivors, and victims on Aces Vanilla+. Updated from in-game stats.
+              Top killers, survivors, and victims on Astral Vanilla+. Updated from in-game stats.
             </p>
           </div>
 

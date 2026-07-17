@@ -12,7 +12,7 @@ async function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Hero
-        title={store?.title || siteConfig.name}
+        title={siteConfig.name}
         descriptionHtml={store?.description || siteConfig.heroFallback}
       />
 

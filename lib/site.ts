@@ -1,10 +1,10 @@
 import { shareMetadata } from '@/lib/share-metadata';
 
 export const siteConfig = {
-  name: 'Aces Vanilla+',
+  name: 'Astral Vanilla+',
   title: shareMetadata.title,
-  logo: '/aces-logo.png',
+  logo: '/astral-logo.png',
   description: shareMetadata.description,
   heroFallback:
-    'Support Aces Vanilla+ and unlock a VIP Kit & Priority Queue.',
+    'Support Astral Vanilla+ and unlock a VIP Kit & Priority Queue.',
 } as const;

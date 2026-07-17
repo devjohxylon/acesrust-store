@@ -125,12 +125,12 @@ export function ServerActivityPanel({ variant = 'full' }: Props) {
           >
             <defs>
               <linearGradient id="pulseFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="rgb(255,23,68)" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="rgb(255,23,68)" stopOpacity="0" />
+                <stop offset="0%" stopColor="rgb(200,204,214)" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="rgb(200,204,214)" stopOpacity="0" />
               </linearGradient>
               <linearGradient id="pulseStroke" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#ff4569" />
-                <stop offset="100%" stopColor="#ff1744" />
+                <stop offset="0%" stopColor="#e4e7ee" />
+                <stop offset="100%" stopColor="#9aa3b5" />
               </linearGradient>
             </defs>
             <path d={chart.area} fill="url(#pulseFill)" className={animated ? 'chart-area-in' : 'opacity-0'} />

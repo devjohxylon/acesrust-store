@@ -21,7 +21,7 @@ export function Footer({ initialStore }: FooterProps) {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p className="text-xs text-muted">
-            &copy; {currentYear} {store?.title || siteConfig.name}
+            &copy; {currentYear} {siteConfig.name}
           </p>
 
           <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
