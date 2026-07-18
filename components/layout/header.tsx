@@ -44,7 +44,7 @@ export function Header({ initialStore }: HeaderProps) {
       <div className="container mx-auto px-4">
         <div className="flex h-14 items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 min-w-0">
-            <div className="relative w-8 h-8 rounded-md overflow-hidden shrink-0">
+            <div className="relative w-8 h-8 shrink-0">
               <Image
                 src={siteConfig.logo}
                 alt={siteConfig.name}
