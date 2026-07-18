@@ -10,11 +10,11 @@ const MESSAGES: Record<string, string> = {
     'Discord login is not configured. In Vercel, set DISCORD_CLIENT_ID and NEXT_PUBLIC_DISCORD_CLIENT_ID (same value).',
   missing_code: 'Login was interrupted. Please try again.',
   state_mismatch:
-    'Login session expired. Clear cookies for acesrust.com and try again — always use https://acesrust.com (not www).',
+    'Login session expired. Clear cookies for astralrce.com and try again — use https://www.astralrce.com.',
   token_exchange:
     'Discord rejected the login. Check the redirect URL and client secret below, then redeploy.',
   token_exchange_redirect:
-    'Redirect URL mismatch. In Discord → OAuth2 → Redirects, add exactly: https://acesrust.com/api/auth/discord/callback (no trailing slash, not /api/oauth/...).',
+    'Redirect URL mismatch. In Discord → OAuth2 → Redirects, add exactly: https://www.astralrce.com/api/auth/discord/callback (no trailing slash, not /api/oauth/...).',
   token_exchange_secret:
     'Wrong Discord client secret. In Vercel, set DISCORD_CLIENT_SECRET to the secret from Discord → OAuth2 (click Reset Secret if unsure), then redeploy.',
   token_exchange_client:

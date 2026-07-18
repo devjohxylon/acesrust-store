@@ -1,18 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { fetchFromTip4Serv, apiCache } from '@/lib/api-client';
+import { brandifyText } from '@/lib/branding';
 import { StoreSchema } from '@/lib/schemas';
+import { siteConfig } from '@/lib/site';
+
+function withAstralBranding<T extends { title?: string; description?: string; logo?: string }>(
+  store: T
+): T {
+  return {
+    ...store,
+    title: siteConfig.name,
+    description: brandifyText(store.description || ''),
+    // Always use our hosted Astral mark — Tip4Serv CDN may still be the old Aces logo.
+    logo: siteConfig.logo,
+  };
+}
 
 export async function GET() {
   try {
-    const cacheKey = 'store:whoami';
+    const cacheKey = 'store:whoami:astral';
     const cached = apiCache.get(cacheKey);
-    
+
     if (cached) {
       return NextResponse.json(cached);
     }
 
     const response = await fetchFromTip4Serv('/store/whoami');
-    
+
     if (!response.ok) {
       return NextResponse.json(
         { error: 'Failed to fetch store information' },
@@ -21,16 +35,13 @@ export async function GET() {
     }
 
     const data = await response.json();
-    const validated = StoreSchema.parse(data);
-    
+    const validated = withAstralBranding(StoreSchema.parse(data));
+
     apiCache.set(cacheKey, validated);
-    
+
     return NextResponse.json(validated);
   } catch (error) {
     console.error('Error fetching store info:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import type { LeaderboardData } from '@/lib/leaderboard-data';
+import { brandifyText } from '@/lib/branding';
 import {
   MAX_POP_POINTS,
   MAX_PURCHASES,
@@ -25,7 +26,10 @@ function sortByScheduled(a: WipeSchedule, b: WipeSchedule) {
 
 export async function getLeaderboard(): Promise<LeaderboardData> {
   const { leaderboard } = await readCmsData();
-  return leaderboard;
+  return {
+    ...leaderboard,
+    serverName: brandifyText(leaderboard.serverName || 'Astral Vanilla+'),
+  };
 }
 
 export async function saveLeaderboard(input: LeaderboardUpdateInput): Promise<void> {
@@ -33,7 +37,7 @@ export async function saveLeaderboard(input: LeaderboardUpdateInput): Promise<vo
 
   data.leaderboard = {
     ...data.leaderboard,
-    serverName: input.serverName.trim(),
+    serverName: brandifyText(input.serverName.trim()),
     totalKills: input.totalKills,
     updatedAt: formatUpdatedAt(new Date().toISOString()),
     topKillers: input.topKillers,
@@ -119,7 +123,7 @@ export async function saveServerStatus(input: ServerStatusInput): Promise<Server
     players,
     maxPlayers,
     queued: Math.max(0, Math.round(input.queued ?? 0)),
-    serverName: input.serverName?.trim() || data.server.serverName || null,
+    serverName: brandifyText(input.serverName?.trim() || data.server.serverName || 'Astral Vanilla+'),
     updatedAt: now,
   };
 

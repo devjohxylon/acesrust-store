@@ -1,5 +1,7 @@
+import { brandifyText } from '@/lib/branding';
 import { config } from '@/lib/config';
 import type { Store } from '@/lib/schemas';
+import { siteConfig } from '@/lib/site';
 
 type CacheEntry<T> = {
   data: T;
@@ -86,12 +88,17 @@ export async function getStoreWhoami(): Promise<Store | null> {
       return null;
     }
 
-    const data = await response.json();
-    
-    // Cache the result
-    apiCache.set('store_whoami', data);
-    
-    return data;
+    const data = (await response.json()) as Store;
+    const branded: Store = {
+      ...data,
+      title: siteConfig.name,
+      description: brandifyText(data.description || ''),
+      logo: siteConfig.logo,
+    };
+
+    apiCache.set('store_whoami', branded);
+
+    return branded;
   } catch (error) {
     console.error('Error fetching store whoami:', error);
     return null;
