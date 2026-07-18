@@ -220,22 +220,22 @@ export const CheckoutUserSchema = z.object({
 export type CheckoutUser = z.infer<typeof CheckoutUserSchema>;
 
 export const CheckoutProductSchema = z.object({
-  product_id: z.number(),
+  product_id: z.number().int().positive(),
   type: z.enum(['addtocart', 'subscribe']),
-  quantity: z.number(),
-  donation_amount: z.number().optional(),
-  server_selection: z.number().optional(),
+  quantity: z.number().int().positive().max(100),
+  donation_amount: z.number().nonnegative().max(100_000).optional(),
+  server_selection: z.number().int().optional(),
   custom_fields: z.record(z.string(), z.any()).optional(),
 });
 
 export type CheckoutProduct = z.infer<typeof CheckoutProductSchema>;
 
 export const CheckoutRequestSchema = z.object({
-  products: z.array(CheckoutProductSchema),
+  products: z.array(CheckoutProductSchema).min(1).max(50),
   user: CheckoutUserSchema,
-  redirect_success_checkout: z.string().optional(),
-  redirect_canceled_checkout: z.string().optional(),
-  redirect_pending_checkout: z.string().optional(),
+  redirect_success_checkout: z.string().url().max(2048).optional(),
+  redirect_canceled_checkout: z.string().url().max(2048).optional(),
+  redirect_pending_checkout: z.string().url().max(2048).optional(),
 });
 
 export type CheckoutRequest = z.infer<typeof CheckoutRequestSchema>;
@@ -249,17 +249,22 @@ export type CheckoutIdentifiersResponse = z.infer<typeof CheckoutIdentifiersResp
 
 // Precheckout Request (for anonymous users)
 export const PrecheckoutRequestSchema = z.object({
-  products: z.array(z.object({
-    product_id: z.number(),
-    type: z.string(),
-    quantity: z.number(),
-    custom_fields: z.record(z.string(), z.any()).optional(),
-    server_selection: z.number().optional(),
-    donation_amount: z.number().optional(),
-  })),
-  redirect_success_checkout: z.string(),
-  redirect_canceled_checkout: z.string(),
-  redirect_pending_checkout: z.string(),
+  products: z
+    .array(
+      z.object({
+        product_id: z.number().int().positive(),
+        type: z.string().max(32),
+        quantity: z.number().int().positive().max(100),
+        custom_fields: z.record(z.string(), z.any()).optional(),
+        server_selection: z.number().int().optional(),
+        donation_amount: z.number().nonnegative().max(100_000).optional(),
+      })
+    )
+    .min(1)
+    .max(50),
+  redirect_success_checkout: z.string().url().max(2048),
+  redirect_canceled_checkout: z.string().url().max(2048),
+  redirect_pending_checkout: z.string().url().max(2048),
 });
 
 export type PrecheckoutRequest = z.infer<typeof PrecheckoutRequestSchema>;

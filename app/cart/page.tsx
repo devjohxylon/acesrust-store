@@ -112,16 +112,16 @@ export default function CartPage() {
 
   if (cart.items.length === 0) {
     return (
-      <div className="min-h-screen py-12">
+      <div className="min-h-screen py-8 sm:py-12 pb-[max(3rem,env(safe-area-inset-bottom))]">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center py-20">
-            <ShoppingCart className="w-24 h-24 text-muted mx-auto mb-6" />
-            <h1 className="text-3xl font-bold mb-4">Your Cart is Empty</h1>
-            <p className="text-muted mb-8">
-              Looks like you haven't added any products to your cart yet.
+          <div className="max-w-2xl mx-auto text-center py-12 sm:py-20">
+            <ShoppingCart className="w-16 h-16 sm:w-24 sm:h-24 text-muted mx-auto mb-6" />
+            <h1 className="text-2xl sm:text-3xl font-bold mb-4">Your Cart is Empty</h1>
+            <p className="text-muted mb-8 text-sm sm:text-base">
+              Looks like you haven&apos;t added any products to your cart yet.
             </p>
             <Link href="/shop">
-              <button className="px-8 py-4 rounded-xl bg-primary hover:bg-primary/90 text-background font-semibold text-lg transition-all glow-primary hover:scale-105 inline-flex items-center gap-2 cursor-pointer">
+              <button className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl bg-primary hover:bg-primary/90 text-background font-semibold text-base sm:text-lg transition-all glow-primary hover:scale-105 inline-flex items-center gap-2 cursor-pointer touch-manipulation min-h-12">
                 Browse Products
                 <ArrowRight className="w-5 h-5" />
               </button>
@@ -133,13 +133,13 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen py-8 sm:py-12 pb-[max(3rem,env(safe-area-inset-bottom))]">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Shopping Cart</h1>
-            <p className="text-muted">{cart.getItemCount()} item{cart.getItemCount() !== 1 ? 's' : ''} in your cart</p>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-4xl font-bold mb-2">Shopping Cart</h1>
+            <p className="text-muted text-sm sm:text-base">{cart.getItemCount()} item{cart.getItemCount() !== 1 ? 's' : ''} in your cart</p>
           </div>
 
           {precheckoutError && (
@@ -162,94 +162,96 @@ export default function CartPage() {
                 return (
                 <div
                   key={`${item.product.id}-${index}`}
-                  className="flex gap-4 p-4 rounded-xl bg-card border border-border"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-card border border-border"
                 >
-                  {/* Image */}
-                  <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-gradient-card flex-shrink-0">
-                    {(() => {
-                      const imageSrc = item.product.image || ("gallery" in item.product ? item.product.gallery?.[0] : undefined);
-                      if (!imageSrc) {
+                  <div className="flex gap-3 sm:gap-4 min-w-0 flex-1">
+                    {/* Image */}
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gradient-card flex-shrink-0">
+                      {(() => {
+                        const imageSrc = item.product.image || ("gallery" in item.product ? item.product.gallery?.[0] : undefined);
+                        if (!imageSrc) {
+                          return (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <ShoppingCart className="w-8 h-8 text-primary/30" />
+                            </div>
+                          );
+                        }
+
                         return (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <ShoppingCart className="w-8 h-8 text-primary/30" />
-                          </div>
+                          <Image
+                            src={imageSrc}
+                            alt={item.product.name}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
                         );
-                      }
-
-                      return (
-                        <Image
-                          src={imageSrc}
-                          alt={item.product.name}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      );
-                    })()}
-                  </div>
-
-                  {/* Details */}
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/product/${item.product.slug}`}>
-                      <h3 className="font-semibold text-lg mb-1 hover:text-primary transition-colors truncate">
-                        {item.product.name}
-                      </h3>
-                    </Link>
-                    <p className="text-2xl font-bold text-primary mb-2">
-                      ${(() => {
-                        // For donation products, use donation amount as the price
-                        if ('donation' in item.product && item.product.donation && item.donationAmount !== undefined) {
-                          return item.donationAmount.toFixed(2);
-                        }
-
-                        let price = item.product.price;
-                        
-                        // Add custom field prices
-                        if (item.customFields && 'custom_fields' in item.product && item.product.custom_fields) {
-                          item.product.custom_fields.forEach((field) => {
-                            const key = field.marker || field.id.toString();
-                            const value = item.customFields?.[key];
-                            
-                            if (field.type === 'checkbox' && value) {
-                              price += field.price || 0;
-                            } else if ((field.type === 'select' || field.type === 'selection' || field.type === 'dropdown' || field.type === 'choice') && value && field.options) {
-                              const selectedOption = field.options.find((opt) => opt.id.toString() === value.toString());
-                              if (selectedOption) {
-                                price += selectedOption.price || 0;
-                              }
-                            } else if (field.type === 'number' || field.type === 'range') {
-                              price += calculateNumberRangeCharge(field, value);
-                            }
-                          });
-                        }
-                        
-                        return price.toFixed(2);
                       })()}
-                    </p>
-                    {item.product.subscription && item.subscriptionType === 'recurring' && (
-                      <p className="text-xs text-muted">
-                        Subscription - Renews every {item.product.period_num} {item.product.duration_periodicity}
-                        {item.product.period_num && item.product.period_num > 1 ? 's' : ''}
+                    </div>
+
+                    {/* Details */}
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/product/${item.product.slug}`} className="touch-manipulation">
+                        <h3 className="font-semibold text-base sm:text-lg mb-1 hover:text-primary transition-colors line-clamp-2 sm:truncate">
+                          {item.product.name}
+                        </h3>
+                      </Link>
+                      <p className="text-xl sm:text-2xl font-bold text-primary mb-1 sm:mb-2">
+                        ${(() => {
+                          // For donation products, use donation amount as the price
+                          if ('donation' in item.product && item.product.donation && item.donationAmount !== undefined) {
+                            return item.donationAmount.toFixed(2);
+                          }
+
+                          let price = item.product.price;
+                          
+                          // Add custom field prices
+                          if (item.customFields && 'custom_fields' in item.product && item.product.custom_fields) {
+                            item.product.custom_fields.forEach((field) => {
+                              const key = field.marker || field.id.toString();
+                              const value = item.customFields?.[key];
+                              
+                              if (field.type === 'checkbox' && value) {
+                                price += field.price || 0;
+                              } else if ((field.type === 'select' || field.type === 'selection' || field.type === 'dropdown' || field.type === 'choice') && value && field.options) {
+                                const selectedOption = field.options.find((opt) => opt.id.toString() === value.toString());
+                                if (selectedOption) {
+                                  price += selectedOption.price || 0;
+                                }
+                              } else if (field.type === 'number' || field.type === 'range') {
+                                price += calculateNumberRangeCharge(field, value);
+                              }
+                            });
+                          }
+                          
+                          return price.toFixed(2);
+                        })()}
                       </p>
-                    )}
-                    {item.product.subscription && item.subscriptionType === 'onetime' && (
-                      <p className="text-xs text-muted">
-                        One-time purchase - {item.product.period_num} {item.product.duration_periodicity}
-                        {item.product.period_num && item.product.period_num > 1 ? 's' : ''}
-                      </p>
-                    )}
-                    {customFieldsDisplay && (
-                      <p className="text-xs text-primary/80 mt-2 italic">
-                        {customFieldsDisplay}
-                      </p>
-                    )}
+                      {item.product.subscription && item.subscriptionType === 'recurring' && (
+                        <p className="text-xs text-muted">
+                          Subscription - Renews every {item.product.period_num} {item.product.duration_periodicity}
+                          {item.product.period_num && item.product.period_num > 1 ? 's' : ''}
+                        </p>
+                      )}
+                      {item.product.subscription && item.subscriptionType === 'onetime' && (
+                        <p className="text-xs text-muted">
+                          One-time purchase - {item.product.period_num} {item.product.duration_periodicity}
+                          {item.product.period_num && item.product.period_num > 1 ? 's' : ''}
+                        </p>
+                      )}
+                      {customFieldsDisplay && (
+                        <p className="text-xs text-primary/80 mt-2 italic">
+                          {customFieldsDisplay}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   {/* Quantity & Remove */}
-                  <div className="flex flex-col items-end justify-between">
+                  <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between gap-3 border-t sm:border-t-0 border-border pt-3 sm:pt-0">
                     <button
                       onClick={() => cart.removeItemByIndex(index)}
-                      className="p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors cursor-pointer"
+                      className="w-11 h-11 sm:w-auto sm:h-auto p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors cursor-pointer touch-manipulation flex items-center justify-center"
                       aria-label="Remove from cart"
                     >
                       <Trash2 className="w-5 h-5" />
@@ -258,7 +260,8 @@ export default function CartPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => cart.updateQuantity(item.product.id, item.quantity - 1, item.customFields)}
-                        className="w-8 h-8 rounded-lg bg-background border border-border hover:border-primary transition-colors flex items-center justify-center cursor-pointer"
+                        className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-background border border-border hover:border-primary transition-colors flex items-center justify-center cursor-pointer touch-manipulation"
+                        aria-label="Decrease quantity"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
@@ -271,7 +274,8 @@ export default function CartPage() {
                           }
                         }}
                         disabled={typeof item.product.stock === 'number' && item.quantity >= item.product.stock}
-                        className="w-8 h-8 rounded-lg bg-background border border-border hover:border-primary transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-background border border-border hover:border-primary transition-colors flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                        aria-label="Increase quantity"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -284,8 +288,8 @@ export default function CartPage() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="sticky top-20 p-6 rounded-xl bg-card border border-border">
-                <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
+              <div className="sticky top-20 p-4 sm:p-6 rounded-xl bg-card border border-border">
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Order Summary</h2>
 
                 <div className="space-y-4 mb-6">
                   {cart.items.map((item, index) => {
@@ -354,7 +358,7 @@ export default function CartPage() {
                   <button
                     onClick={handleCheckout}
                     disabled={isCheckingOut || !flagsLoaded}
-                    className="w-full px-8 py-4 rounded-xl bg-primary hover:bg-primary/90 text-background font-semibold text-lg transition-all glow-primary hover:scale-105 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="w-full min-h-12 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl bg-primary hover:bg-primary/90 text-background font-semibold text-base sm:text-lg transition-all glow-primary hover:scale-105 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 touch-manipulation"
                   >
                     {isCheckingOut ? (
                       <>

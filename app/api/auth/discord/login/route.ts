@@ -6,8 +6,17 @@ import {
   getDiscordClientSecret,
 } from '@/lib/engagement/discord-oauth';
 import { setOAuthStateCookies } from '@/lib/engagement/session';
+import { sanitizeReturnPath } from '@/lib/safe-redirect';
+import { clientIp, rateLimit } from '@/lib/security';
 
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(`discord-login:${clientIp(request)}`, 30, 60_000);
+  if (!limited.ok) {
+    return NextResponse.redirect(
+      new URL('/?login_error=rate_limited', request.nextUrl.origin)
+    );
+  }
+
   const clientId = getDiscordClientId();
   const clientSecret = getDiscordClientSecret();
 
@@ -18,8 +27,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/?login_error=no_secret', request.nextUrl.origin));
   }
 
-  const returnTo = request.nextUrl.searchParams.get('return_to') || '/';
-  const safeReturn = returnTo.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/';
+  const safeReturn = sanitizeReturnPath(request.nextUrl.searchParams.get('return_to'), '/');
   const nonce = randomBytes(16).toString('hex');
   const redirectUri = discordAuthRedirectUri(request.nextUrl.origin);
 

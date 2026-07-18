@@ -204,9 +204,9 @@ export default function ShopPage() {
       )}
 
       {isLoading && allProducts.length === 0 ? (
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="h-80 rounded-xl bg-card border border-border animate-pulse" />
+            <div key={i} className="h-64 sm:h-80 rounded-xl bg-card border border-border animate-pulse" />
           ))}
         </div>
       ) : productsError ? (
@@ -226,7 +226,7 @@ export default function ShopPage() {
       ) : filteredProducts.length > 0 ? (
         <>
           <p className="text-xs text-muted">{filteredProducts.length} products</p>
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} hideFeaturedBadge />
             ))}
