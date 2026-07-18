@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, Clock, TrendingUp, Users } from 'lucide-react';
+import { Clock, TrendingUp } from 'lucide-react';
 import {
   aggregateByHourOfDay,
   chartPath,
@@ -89,33 +89,32 @@ export function ServerActivityPanel({ variant = 'full' }: Props) {
   const isHome = variant === 'home';
 
   return (
-    <div className={`panel-glow rounded-xl border border-primary/20 bg-card/70 overflow-hidden ${isHome ? '' : ''}`}>
-      <div className="px-5 py-4 border-b border-border/80 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/15 border border-primary/25">
-            <Activity className="w-4 h-4 text-primary" />
-          </span>
-          <div>
-            <h3 className="font-semibold text-white text-sm">Server Pulse</h3>
-            <p className="text-[11px] text-muted">Live population & peak hours</p>
-          </div>
+    <div
+      className={`rounded-lg border border-border bg-card/50 overflow-hidden ${
+        isHome ? '' : ''
+      }`}
+    >
+      <div className="px-4 sm:px-5 py-3.5 border-b border-border flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-muted mb-0.5">Activity</p>
+          <h3 className="font-semibold text-white text-sm tracking-tight">Server pulse</h3>
         </div>
         <div className="flex items-center gap-4 text-xs font-mono">
           <span className="text-muted">
-            now <span className="text-sky-400 font-semibold text-sm">{chart.current}</span>
+            now <span className="text-white tabular-nums">{chart.current}</span>
           </span>
           <span className="text-muted">
-            peak <span className="text-primary font-semibold text-sm">{chart.peak}</span>
+            peak <span className="text-white tabular-nums">{chart.peak}</span>
           </span>
           <span className="text-muted hidden sm:inline">
-            avg <span className="text-white font-semibold text-sm">{chart.avg}</span>
+            avg <span className="text-white tabular-nums">{chart.avg}</span>
           </span>
         </div>
       </div>
 
-      <div className="p-5 space-y-5">
+      <div className="p-4 sm:p-5 space-y-5">
         <div>
-          <p className="text-[11px] uppercase tracking-wider text-muted mb-2">Last 24 hours</p>
+          <p className="text-[11px] uppercase tracking-[0.14em] text-muted mb-2">Last 24 hours</p>
           <svg
             viewBox={`0 0 ${CHART_W} ${CHART_H}`}
             className="w-full h-auto chart-line"
@@ -149,14 +148,14 @@ export function ServerActivityPanel({ variant = 'full' }: Props) {
 
         <div>
           <div className="flex items-center justify-between gap-2 mb-3">
-            <p className="text-[11px] uppercase tracking-wider text-muted flex items-center gap-1.5">
+            <p className="text-[11px] uppercase tracking-[0.14em] text-muted flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" />
-              When players are online
+              Peak hours
             </p>
             {peakWindow && (
-              <p className="text-xs text-primary font-medium flex items-center gap-1">
-                <TrendingUp className="w-3.5 h-3.5" />
-                Peak: {formatPeakRange(peakWindow.startHour, peakWindow.endHour)}
+              <p className="text-xs text-muted flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5 text-primary/80" />
+                {formatPeakRange(peakWindow.startHour, peakWindow.endHour)}
               </p>
             )}
           </div>
@@ -194,10 +193,10 @@ export function ServerActivityPanel({ variant = 'full' }: Props) {
         </div>
 
         {!isHome && (
-          <div className="grid grid-cols-3 gap-3 pt-1">
-            <Stat icon={Users} label="Online now" value={chart.current} accent="text-sky-400" />
-            <Stat icon={TrendingUp} label="24h peak" value={chart.peak} accent="text-primary" />
-            <Stat icon={Activity} label="24h average" value={chart.avg} accent="text-white" />
+          <div className="grid grid-cols-3 gap-px bg-border/70 rounded-md overflow-hidden border border-border/70">
+            <Stat label="Online" value={chart.current} />
+            <Stat label="24h peak" value={chart.peak} />
+            <Stat label="24h avg" value={chart.avg} />
           </div>
         )}
       </div>
@@ -205,22 +204,11 @@ export function ServerActivityPanel({ variant = 'full' }: Props) {
   );
 }
 
-function Stat({
-  icon: Icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: typeof Users;
-  label: string;
-  value: number;
-  accent: string;
-}) {
+function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-border/80 bg-background/40 px-3 py-2.5 text-center">
-      <Icon className="w-3.5 h-3.5 text-muted mx-auto mb-1" />
-      <p className={`text-lg font-bold font-mono tabular-nums ${accent}`}>{value}</p>
-      <p className="text-[10px] text-muted">{label}</p>
+    <div className="bg-card/80 px-3 py-2.5 text-center">
+      <p className="text-base font-mono tabular-nums text-white">{value}</p>
+      <p className="text-[10px] text-muted mt-0.5">{label}</p>
     </div>
   );
 }

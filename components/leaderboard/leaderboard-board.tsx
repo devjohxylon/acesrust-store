@@ -7,61 +7,59 @@ type LeaderboardBoardProps = {
   data: LeaderboardData;
 };
 
-function rankClass(rank: number) {
-  if (rank === 1) return 'text-yellow-400';
-  if (rank === 2) return 'text-gray-300';
-  if (rank === 3) return 'text-amber-600';
-  return 'text-foreground/90';
+function rankTone(rank: number) {
+  if (rank === 1) return 'text-white';
+  if (rank === 2) return 'text-foreground/90';
+  if (rank === 3) return 'text-foreground/80';
+  return 'text-muted';
 }
 
 function LeaderboardTable({
   title,
-  titleClass,
   headerLabel,
   entries,
   emptyMessage,
 }: {
   title: string;
-  titleClass: string;
   headerLabel: string;
   entries: LeaderboardEntry[];
   emptyMessage?: string;
 }) {
   return (
-    <div className="flex flex-col min-h-0">
-      <h3 className={`text-sm font-bold tracking-wide mb-3 ${titleClass}`}>
-        « {title} »
-      </h3>
-      <div className="grid grid-cols-[2rem_1fr_3rem] gap-x-2 text-[11px] sm:text-xs font-mono text-sky-400/90 mb-1 px-1">
-        <span>Rank</span>
-        <span>Player</span>
-        <span className="text-right">{headerLabel}</span>
+    <div className="min-w-0">
+      <div className="flex items-baseline justify-between gap-3 mb-3">
+        <h3 className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted">
+          {title}
+        </h3>
+        <span className="text-[10px] uppercase tracking-wider text-muted/70">{headerLabel}</span>
       </div>
-      <div className="border-t border-primary/30 mb-2" />
+
       {entries.length === 0 ? (
-        <p className="text-xs font-mono text-muted px-1 py-4">
-          {emptyMessage ?? 'No data yet'}
-        </p>
+        <p className="text-xs text-muted/80 py-6">{emptyMessage ?? 'No data yet'}</p>
       ) : (
         <motion.ul
-          className="space-y-0.5"
+          className="divide-y divide-border/70"
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={{ show: { transition: { staggerChildren: 0.04 } } }}
+          viewport={{ once: true, amount: 0.15 }}
+          variants={{ show: { transition: { staggerChildren: 0.03 } } }}
         >
           {entries.map((entry) => (
             <motion.li
               key={`${title}-${entry.rank}-${entry.player}`}
               variants={{
-                hidden: { opacity: 0, x: -12 },
-                show: { opacity: 1, x: 0, transition: { duration: 0.35 } },
+                hidden: { opacity: 0, y: 6 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.28 } },
               }}
-              className="grid grid-cols-[2rem_1fr_3rem] gap-x-2 text-[11px] sm:text-xs font-mono px-1 py-0.5 rounded hover:bg-white/5 transition-colors"
+              className="grid grid-cols-[2rem_1fr_auto] gap-x-3 items-center py-2 text-sm"
             >
-              <span className={rankClass(entry.rank)}>{entry.rank}</span>
-              <span className={`truncate ${rankClass(entry.rank)}`}>{entry.player}</span>
-              <span className={`text-right ${rankClass(entry.rank)}`}>{entry.value}</span>
+              <span className={`font-mono text-xs tabular-nums ${rankTone(entry.rank)}`}>
+                {String(entry.rank).padStart(2, '0')}
+              </span>
+              <span className={`truncate ${entry.rank <= 3 ? 'text-white' : 'text-foreground/85'}`}>
+                {entry.player}
+              </span>
+              <span className="font-mono text-xs tabular-nums text-primary/90">{entry.value}</span>
             </motion.li>
           ))}
         </motion.ul>
@@ -77,75 +75,56 @@ export function LeaderboardBoard({ data }: LeaderboardBoardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 28, scale: 0.98 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
-      className="relative rounded-xl border border-primary/20 bg-[#1a1a1a] overflow-hidden shadow-2xl glow-primary"
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
+      className="rounded-lg border border-border bg-card/50 overflow-hidden"
     >
-      <div className="px-4 sm:px-6 py-4 border-b border-white/10 bg-black/30">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <h2 className="text-lg sm:text-xl font-bold font-mono text-white tracking-tight">
+      <div className="px-4 sm:px-5 py-3.5 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-muted mb-0.5">In-game</p>
+          <h2 className="text-base sm:text-lg font-semibold text-white tracking-tight">
             {data.serverName}
           </h2>
-          <p className="text-sm font-mono">
-            <span className="text-muted">Total Kills: </span>
-            <span className="text-sky-400 font-semibold">{data.totalKills}</span>
-          </p>
         </div>
+        <p className="text-xs text-muted">
+          Total kills{' '}
+          <span className="font-mono text-sm text-white tabular-nums">{data.totalKills}</span>
+        </p>
       </div>
 
-      <div className="p-4 sm:p-6">
+      <div className="p-4 sm:p-5">
         {kaosImageSrc ? (
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={kaosImageSrc}
-              alt={`${data.serverName} leaderboard`}
-              className="w-full h-auto rounded-lg border border-white/10"
-            />
-            <p className="text-[10px] sm:text-xs font-mono text-muted text-center">
-              Live stats from KAOS — synced from Discord
-            </p>
-          </motion.div>
+          <div className="space-y-3">
+            <div className="relative mx-auto max-w-xl overflow-hidden rounded-md border border-border/80 bg-black/40">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={kaosImageSrc}
+                alt={`${data.serverName} leaderboard`}
+                className="w-full h-auto max-h-[28rem] object-contain object-top"
+              />
+            </div>
+            <p className="text-[11px] text-muted text-center">Synced from KAOS</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
-            <LeaderboardTable
-              title="TOP KILLERS"
-              titleClass="text-primary"
-              headerLabel="Kills"
-              entries={data.topKillers}
-            />
-
+            <LeaderboardTable title="Top killers" headerLabel="Kills" entries={data.topKillers} />
             <div className="flex flex-col gap-8">
               <LeaderboardTable
-                title="TOP SURVIVORS (K/D)"
-                titleClass="text-sky-400"
+                title="Top survivors"
                 headerLabel="K/D"
                 entries={data.topSurvivors}
                 emptyMessage="No survivors ranked yet"
               />
-              <LeaderboardTable
-                title="TOP VICTIMS"
-                titleClass="text-orange-400"
-                headerLabel="Deaths"
-                entries={data.topVictims}
-              />
+              <LeaderboardTable title="Top victims" headerLabel="Deaths" entries={data.topVictims} />
             </div>
           </div>
         )}
       </div>
 
-      <div className="px-4 sm:px-6 py-3 border-t border-white/10 bg-black/20">
-        <p className="text-[10px] sm:text-xs font-mono text-muted text-center">
-          {data.updatedAt}
-        </p>
+      <div className="px-4 sm:px-5 py-2.5 border-t border-border">
+        <p className="text-[10px] text-muted/80 text-center font-mono">{data.updatedAt}</p>
       </div>
     </motion.div>
   );
