@@ -49,7 +49,7 @@ export function CheckinToast() {
           initial={{ opacity: 0, y: 24, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 12, scale: 0.97 }}
-          className="fixed bottom-6 right-6 z-50 max-w-xs"
+          className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))] left-[max(1rem,env(safe-area-inset-left))] sm:left-auto z-50 max-w-xs sm:ml-auto"
         >
           <div className="rounded-xl bg-card border border-primary/40 shadow-2xl glow-primary p-4">
             <div className="flex items-start gap-3">

@@ -9,8 +9,17 @@ import {
 const COOKIE_NAME = 'aces_admin';
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 
+/** Prefer a dedicated signing secret so rotating the password doesn't break sessions. */
+function adminSessionSecret(): string {
+  return (
+    process.env.ADMIN_SESSION_SECRET?.trim() ||
+    getAdminPassword() ||
+    ''
+  );
+}
+
 export async function setAdminSession() {
-  const secret = getAdminPassword();
+  const secret = adminSessionSecret();
   if (!secret) return;
 
   const cookieStore = await cookies();
@@ -29,7 +38,7 @@ export async function clearAdminSession() {
 }
 
 export async function isAdminSessionValid() {
-  const secret = getAdminPassword();
+  const secret = adminSessionSecret();
   if (!secret) return false;
 
   const cookieStore = await cookies();
