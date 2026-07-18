@@ -8,6 +8,22 @@ const securityHeaders = [
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=(), payment=()',
   },
+  {
+    key: 'Content-Security-Policy',
+    value: [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.tip4serv.com",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https://cdn.tip4serv.com https://cdn.z9y7-tip4serv.com https://cdn.discordapp.com https://*.public.blob.vercel-storage.com",
+      "font-src 'self' data:",
+      "connect-src 'self' https://api.tip4serv.com https://js.tip4serv.com https://cdn.discordapp.com",
+      "frame-src 'self' https://tip4serv.com https://*.tip4serv.com",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "object-src 'none'",
+    ].join('; '),
+  },
   ...(process.env.NODE_ENV === 'production'
     ? [
         {

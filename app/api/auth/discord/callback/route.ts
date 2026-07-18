@@ -11,6 +11,7 @@ import {
 } from '@/lib/engagement/discord-oauth';
 import { isEngagementConfigured } from '@/lib/engagement/db';
 import { upsertProfile } from '@/lib/engagement/service';
+import { sanitizeReturnPath } from '@/lib/safe-redirect';
 import { safeCompare } from '@/lib/security';
 
 const DISCORD_API = 'https://discord.com/api/v10';
@@ -34,7 +35,10 @@ export async function GET(request: NextRequest) {
 
   const separator = stored.indexOf(':');
   const nonce = separator === -1 ? stored : stored.slice(0, separator);
-  const returnTo = separator === -1 ? '/' : stored.slice(separator + 1) || '/';
+  const returnTo = sanitizeReturnPath(
+    separator === -1 ? '/' : stored.slice(separator + 1) || '/',
+    '/'
+  );
   if (!safeCompare(nonce, state)) return fail(origin, 'state_mismatch');
 
   // Must match the redirect_uri from the authorize step byte-for-byte.

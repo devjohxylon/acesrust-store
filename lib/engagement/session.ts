@@ -9,7 +9,13 @@ export const SESSION_COOKIE_NAME = 'aces_session';
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 
 function sessionSecret(): string {
-  return process.env.AUTH_SECRET || process.env.DISCORD_CLIENT_SECRET || '';
+  // Prefer AUTH_SECRET — never silently fall back to the Discord client secret.
+  const dedicated = process.env.AUTH_SECRET?.trim();
+  if (dedicated) return dedicated;
+  if (process.env.NODE_ENV !== 'production') {
+    return process.env.DISCORD_CLIENT_SECRET?.trim() || '';
+  }
+  return '';
 }
 
 function sign(payload: string, secret: string): string {

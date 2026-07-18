@@ -21,7 +21,8 @@ const MESSAGES: Record<string, string> = {
     'Discord client ID mismatch. Set DISCORD_CLIENT_ID and NEXT_PUBLIC_DISCORD_CLIENT_ID to the same Application ID, then redeploy.',
   get_user: 'Could not load your Discord profile. Please try again.',
   no_secret:
-    'Missing DISCORD_CLIENT_SECRET or AUTH_SECRET in Vercel. Add them and redeploy.',
+    'Missing AUTH_SECRET (required) or DISCORD_CLIENT_SECRET in Vercel. Add them and redeploy.',
+  rate_limited: 'Too many login attempts. Wait a minute and try again.',
   unknown: 'Something went wrong during login. Please try again.',
 };
 

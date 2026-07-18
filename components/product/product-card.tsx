@@ -75,161 +75,159 @@ export function ProductCard({ product, hideFeaturedBadge = false }: ProductCardP
     return html.replace(/<[^>]*>/g, '').trim();
   };
 
-  const CardContent = (
-    <div className={`group relative h-full rounded-xl bg-card border border-border transition-all duration-300 overflow-hidden ${
-      isOutOfStock 
-        ? 'opacity-60 grayscale cursor-not-allowed' 
-        : 'hover:border-primary'
-    }`}>
-          {/* Badges */}
-          <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end">
-            {/* Non-recurring discount badge - shows period and normal price after first payment */}
-            {product.subscription && product.recurring_discount === false && product.old_price && product.old_price > product.price && product.period_num && product.duration_periodicity && (
-              <span className="px-3 py-1.5 text-xs font-semibold rounded-full border border-primary/70 text-primary bg-background/60">
-                {product.period_num} {product.duration_periodicity}{product.period_num > 1 ? 's' : ''} at ${product.old_price.toFixed(2)}
-              </span>
-            )}
-            {product.featured && !hideFeaturedBadge && (
-              <span className="px-3 py-1.5 text-xs font-semibold rounded-full border border-primary/70 text-primary bg-background/60">
-                Featured
-              </span>
-            )}
-            {product.percent_off && product.percent_off > 0 && product.price > 0 && (
-              <span className="px-3 py-1.5 text-xs font-semibold rounded-full border border-primary/70 text-primary bg-background/60">
-                -{product.percent_off}%
-              </span>
-            )}
-            {typeof product.stock === 'number' && (
-              <span className="px-3 py-1.5 text-xs font-semibold rounded-full border border-red-500/70 text-red-400 bg-background/60">
-                {product.stock === 0 ? 'Out of stock' : `Stock: ${product.stock}`}
-              </span>
-            )}
-          </div>
-
-          {/* Image */}
-          <div className="relative w-full h-48 bg-gradient-card overflow-hidden">
-            {product.image ? (
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className={`object-contain transition-transform duration-300 ${
-                  isOutOfStock ? '' : 'group-hover:scale-105'
-                }`}
-                unoptimized
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Zap className="w-16 h-16 text-primary/30" />
-              </div>
-            )}
-          </div>
-
-          {/* Content */}
-          <div className="p-4 flex flex-col gap-3 h-full">
-            <h3 className={`font-semibold text-lg line-clamp-1 transition-colors ${
-              isOutOfStock ? '' : 'group-hover:text-primary'
-            }`}>
-              {product.name}
-            </h3>
-            
-            <div className="min-h-[44px] text-sm text-muted">
-              {product.small_description ? (
-                <p className="line-clamp-2">{stripHtml(product.small_description)}</p>
-              ) : (
-                <span className="invisible">placeholder</span>
-              )}
-            </div>
-
-            {/* Price & CTA */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex items-baseline gap-2 flex-wrap">
-                  <span className="text-2xl font-bold text-primary">
-                    {product.price > 0 ? `$${product.price.toFixed(2)}` : 'Free'}
-                  </span>
-                  {/* For subscriptions with non-recurring discount, show "then original price / period" */}
-                  {product.subscription && product.recurring_discount === false && product.old_price && product.old_price > product.price ? (
-                    <>
-                      <span className="text-sm text-muted">then</span>
-                      <span className="text-sm text-muted">
-                        ${product.old_price.toFixed(2)}
-                      </span>
-                      {product.period_num && product.duration_periodicity && (
-                        <span className="text-sm text-muted">
-                          / {product.period_num > 1 ? `${product.period_num} ` : ''}{product.duration_periodicity}
-                          {product.period_num > 1 ? 's' : ''}
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {product.subscription && product.period_num && product.duration_periodicity && (
-                        <span className="text-sm text-muted">
-                          / {product.period_num > 1 ? `${product.period_num} ` : ''}{product.duration_periodicity}
-                          {product.period_num > 1 ? 's' : ''}
-                        </span>
-                      )}
-                      {product.old_price && product.old_price > 0 && product.old_price > product.price ? (
-                        <span className="text-sm text-muted line-through">
-                          ${product.old_price.toFixed(2)}
-                        </span>
-                      ) : null}
-                    </>
-                  )}
-                  </div>
-                  {product.price > 0 && (
-                    <p className="text-[11px] text-primary/90 font-medium">
-                      +{Math.max(1, Math.round(product.price * 5))} pts when you buy
-                    </p>
-                  )}
-                </div>
-
-                <motion.button
-                  onClick={handleAddToCart}
-                  whileTap={{ scale: 0.9 }}
-                  animate={added ? { scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 0.3 }}
-                  className={`p-2 rounded-lg text-background transition-all cursor-pointer ${
-                    isOutOfStock 
-                      ? 'bg-muted/50 cursor-not-allowed' 
-                      : added 
-                        ? 'bg-green-500 glow-primary' 
-                        : 'bg-primary hover:bg-primary/90 glow-primary'
-                  }`}
-                  aria-label={product.subscription && !needsCustomFields ? 'Subscribe' : 'Add to cart'}
-                  disabled={isOutOfStock}
-                >
-                  {added ? (
-                    <Check className="w-5 h-5" />
-                  ) : product.subscription && !needsCustomFields ? (
-                    <ArrowRight className="w-5 h-5" />
-                  ) : (
-                    <ShoppingCart className="w-5 h-5" />
-                  )}
-                </motion.button>
-              </div>
-            </div>
-          </div>
-        </div>
-  );
+  const cardClass = `group relative h-full rounded-xl bg-card border border-border transition-all duration-300 overflow-hidden ${
+    isOutOfStock
+      ? 'opacity-60 grayscale cursor-not-allowed'
+      : 'hover:border-primary'
+  }`;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      className={cardClass}
     >
+      {/* Badges */}
+      <div className="absolute top-2 right-2 z-10 flex flex-col gap-1.5 items-end max-w-[70%]">
+        {product.subscription && product.recurring_discount === false && product.old_price && product.old_price > product.price && product.period_num && product.duration_periodicity && (
+          <span className="px-2 py-1 text-[10px] sm:text-xs font-semibold rounded-full border border-primary/70 text-primary bg-background/60">
+            {product.period_num} {product.duration_periodicity}{product.period_num > 1 ? 's' : ''} at ${product.old_price.toFixed(2)}
+          </span>
+        )}
+        {product.featured && !hideFeaturedBadge && (
+          <span className="px-2 py-1 text-[10px] sm:text-xs font-semibold rounded-full border border-primary/70 text-primary bg-background/60">
+            Featured
+          </span>
+        )}
+        {product.percent_off && product.percent_off > 0 && product.price > 0 && (
+          <span className="px-2 py-1 text-[10px] sm:text-xs font-semibold rounded-full border border-primary/70 text-primary bg-background/60">
+            -{product.percent_off}%
+          </span>
+        )}
+        {typeof product.stock === 'number' && (
+          <span className="px-2 py-1 text-[10px] sm:text-xs font-semibold rounded-full border border-red-500/70 text-red-400 bg-background/60">
+            {product.stock === 0 ? 'Out of stock' : `Stock: ${product.stock}`}
+          </span>
+        )}
+      </div>
+
       {isOutOfStock ? (
-        CardContent
+        <div className="relative w-full h-36 sm:h-48 bg-gradient-card overflow-hidden">
+          {product.image ? (
+            <Image src={product.image} alt={product.name} fill className="object-contain" unoptimized />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Zap className="w-12 h-12 sm:w-16 sm:h-16 text-primary/30" />
+            </div>
+          )}
+        </div>
       ) : (
-        <Link href={`/product/${product.slug}`}>
-          {CardContent}
+        <Link href={`/product/${product.slug}`} className="block touch-manipulation">
+          <div className="relative w-full h-36 sm:h-48 bg-gradient-card overflow-hidden">
+            {product.image ? (
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                className="object-contain transition-transform duration-300 group-hover:scale-105"
+                unoptimized
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Zap className="w-12 h-12 sm:w-16 sm:h-16 text-primary/30" />
+              </div>
+            )}
+          </div>
         </Link>
       )}
 
-      {/* Custom Fields Modal */}
+      <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-3">
+        {isOutOfStock ? (
+          <h3 className="font-semibold text-sm sm:text-lg line-clamp-2">{product.name}</h3>
+        ) : (
+          <Link href={`/product/${product.slug}`} className="touch-manipulation">
+            <h3 className="font-semibold text-sm sm:text-lg line-clamp-2 group-hover:text-primary transition-colors">
+              {product.name}
+            </h3>
+          </Link>
+        )}
+
+        <div className="hidden sm:block min-h-[44px] text-sm text-muted">
+          {product.small_description ? (
+            <p className="line-clamp-2">{stripHtml(product.small_description)}</p>
+          ) : (
+            <span className="invisible">placeholder</span>
+          )}
+        </div>
+
+        <div className="flex items-end justify-between gap-2 mt-auto">
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+              <span className="text-lg sm:text-2xl font-bold text-primary">
+                {product.price > 0 ? `$${product.price.toFixed(2)}` : 'Free'}
+              </span>
+              {product.subscription && product.recurring_discount === false && product.old_price && product.old_price > product.price ? (
+                <>
+                  <span className="text-xs sm:text-sm text-muted">then</span>
+                  <span className="text-xs sm:text-sm text-muted">${product.old_price.toFixed(2)}</span>
+                  {product.period_num && product.duration_periodicity && (
+                    <span className="text-xs sm:text-sm text-muted">
+                      / {product.period_num > 1 ? `${product.period_num} ` : ''}{product.duration_periodicity}
+                      {product.period_num > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>
+                  {product.subscription && product.period_num && product.duration_periodicity && (
+                    <span className="text-xs sm:text-sm text-muted">
+                      / {product.period_num > 1 ? `${product.period_num} ` : ''}{product.duration_periodicity}
+                      {product.period_num > 1 ? 's' : ''}
+                    </span>
+                  )}
+                  {product.old_price && product.old_price > 0 && product.old_price > product.price ? (
+                    <span className="text-xs sm:text-sm text-muted line-through">
+                      ${product.old_price.toFixed(2)}
+                    </span>
+                  ) : null}
+                </>
+              )}
+            </div>
+            {product.price > 0 && (
+              <p className="text-[10px] sm:text-[11px] text-primary/90 font-medium">
+                +{Math.max(1, Math.round(product.price * 5))} pts
+              </p>
+            )}
+          </div>
+
+          <motion.button
+            type="button"
+            onClick={handleAddToCart}
+            whileTap={{ scale: 0.9 }}
+            animate={added ? { scale: [1, 1.2, 1] } : {}}
+            transition={{ duration: 0.3 }}
+            className={`shrink-0 w-11 h-11 sm:w-auto sm:h-auto p-2.5 sm:p-2 rounded-lg text-background transition-all cursor-pointer touch-manipulation ${
+              isOutOfStock
+                ? 'bg-muted/50 cursor-not-allowed'
+                : added
+                  ? 'bg-green-500 glow-primary'
+                  : 'bg-primary hover:bg-primary/90 glow-primary'
+            }`}
+            aria-label={product.subscription && !needsCustomFields ? 'Subscribe' : 'Add to cart'}
+            disabled={isOutOfStock}
+          >
+            {added ? (
+              <Check className="w-5 h-5" />
+            ) : product.subscription && !needsCustomFields ? (
+              <ArrowRight className="w-5 h-5" />
+            ) : (
+              <ShoppingCart className="w-5 h-5" />
+            )}
+          </motion.button>
+        </div>
+      </div>
+
       {needsCustomFields && detailedProduct && (
         <CustomFieldsModal
           product={detailedProduct}

@@ -34,7 +34,7 @@ export function LoginButton() {
   }, []);
 
   if (!mounted || isLoading) {
-    return <div className="w-24 h-9 rounded-lg bg-card border border-border shimmer" />;
+    return <div className="w-11 h-11 sm:w-24 sm:h-9 rounded-lg bg-card border border-border shimmer" />;
   }
 
   const user = data?.user;
@@ -42,10 +42,10 @@ export function LoginButton() {
     return (
       <a
         href={`/api/auth/discord/login?return_to=${encodeURIComponent(pathname)}`}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5865F2] hover:bg-[#4752c4] text-white text-sm font-medium transition-colors"
+        className="flex items-center justify-center gap-2 min-w-11 h-11 sm:h-auto px-3 sm:px-4 py-2 rounded-lg bg-[#5865F2] hover:bg-[#4752c4] text-white text-sm font-medium transition-colors touch-manipulation"
       >
         <FaDiscord className="w-4 h-4" />
-        Login
+        <span className="hidden sm:inline">Login</span>
       </a>
     );
   }
@@ -57,7 +57,9 @@ export function LoginButton() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-lg bg-card border border-border hover:border-primary transition-colors cursor-pointer"
+        className="flex items-center gap-2 pl-1.5 pr-1.5 sm:pr-3 py-1.5 min-h-11 sm:min-h-0 rounded-lg bg-card border border-border hover:border-primary transition-colors cursor-pointer touch-manipulation"
+        aria-expanded={open}
+        aria-label="Account menu"
       >
         <span className="relative w-7 h-7 rounded-full overflow-hidden bg-border shrink-0">
           {isValidAvatarUrl(user.avatar) ? (
@@ -68,11 +70,11 @@ export function LoginButton() {
         </span>
         {profile && (
           <>
-            <span className="text-sm font-semibold text-primary">
+            <span className="hidden sm:inline text-sm font-semibold text-primary">
               {profile.total_points.toLocaleString()}
             </span>
             {profile.streak_count > 0 && (
-              <span className="flex items-center gap-0.5 text-xs text-orange-400 font-medium">
+              <span className="hidden sm:flex items-center gap-0.5 text-xs text-orange-400 font-medium">
                 <Flame className="w-3.5 h-3.5" />
                 {profile.streak_count}
               </span>
@@ -88,13 +90,14 @@ export function LoginButton() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-2 w-52 rounded-xl bg-card border border-border shadow-xl overflow-hidden z-50"
+            className="absolute right-0 mt-2 w-[min(13rem,calc(100vw-1.5rem))] rounded-xl bg-card border border-border shadow-xl overflow-hidden z-50"
           >
             <div className="px-4 py-3 border-b border-border">
               <p className="text-sm font-semibold text-white truncate">{user.username}</p>
               {profile && (
                 <p className="text-xs text-muted mt-0.5">
                   {profile.total_points.toLocaleString()} points
+                  {profile.streak_count > 0 ? ` · ${profile.streak_count} day streak` : ''}
                 </p>
               )}
             </div>
@@ -102,7 +105,7 @@ export function LoginButton() {
               <Link
                 href="/profile/me"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-white/5 transition-colors"
+                className="flex items-center gap-2.5 px-3 py-3 sm:py-2 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-white/5 transition-colors touch-manipulation"
               >
                 <User className="w-4 h-4" />
                 My Profile
@@ -110,7 +113,7 @@ export function LoginButton() {
               <Link
                 href="/achievements"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-white/5 transition-colors"
+                className="flex items-center gap-2.5 px-3 py-3 sm:py-2 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-white/5 transition-colors touch-manipulation"
               >
                 <Award className="w-4 h-4" />
                 Achievements
@@ -118,7 +121,7 @@ export function LoginButton() {
               <Link
                 href="/community"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-white/5 transition-colors"
+                className="flex items-center gap-2.5 px-3 py-3 sm:py-2 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-white/5 transition-colors touch-manipulation"
               >
                 <Users className="w-4 h-4" />
                 Community
@@ -126,7 +129,7 @@ export function LoginButton() {
               <Link
                 href="/rewards"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-white/5 transition-colors"
+                className="flex items-center gap-2.5 px-3 py-3 sm:py-2 rounded-lg text-sm text-foreground/80 hover:text-foreground hover:bg-white/5 transition-colors touch-manipulation"
               >
                 <Gift className="w-4 h-4" />
                 Rewards
@@ -138,7 +141,7 @@ export function LoginButton() {
                   await logout.mutateAsync();
                   router.refresh();
                 }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted hover:text-foreground hover:bg-white/5 transition-colors cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-3 sm:py-2 rounded-lg text-sm text-muted hover:text-foreground hover:bg-white/5 transition-colors cursor-pointer touch-manipulation"
               >
                 <LogOut className="w-4 h-4" />
                 Logout

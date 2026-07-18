@@ -1,37 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { safeCheckoutOrigin, sanitizeReturnPath } from '@/lib/safe-redirect';
 
 const DISCORD_API_URL = 'https://discord.com/api/v10';
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 
 export async function GET(request: NextRequest) {
+  const requestOrigin = request.nextUrl.origin;
   try {
     const code = request.nextUrl.searchParams.get('code');
     const state = request.nextUrl.searchParams.get('state');
-    
-    // Parse state to extract origin (format: origin|returnPath or just origin)
-    let baseOrigin = request.nextUrl.origin;
+
+    let baseOrigin = requestOrigin;
     let returnPath = '/checkout';
-    
+
     if (state && state.includes('|')) {
       const parts = state.split('|');
-      baseOrigin = parts[0];
+      baseOrigin = safeCheckoutOrigin(parts[0], requestOrigin);
       if (parts.length === 2) {
-        returnPath = parts[1];
+        returnPath = sanitizeReturnPath(parts[1], '/checkout');
       }
     } else if (state) {
-      baseOrigin = state;
+      baseOrigin = safeCheckoutOrigin(state, requestOrigin);
     }
-    
+
     if (!code) {
-      return NextResponse.redirect(
-        new URL('/checkout?discord_error=no_code', baseOrigin)
-      );
+      return NextResponse.redirect(new URL('/checkout?discord_error=no_code', baseOrigin));
     }
 
     const redirectUri = `${baseOrigin}/api/oauth/discord/callback`;
 
-    // Exchange code for access token
     const tokenResponse = await fetch(`${DISCORD_API_URL}/oauth2/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -45,7 +43,6 @@ export async function GET(request: NextRequest) {
     });
 
     if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text();
       return NextResponse.redirect(
         new URL('/checkout?discord_error=token_exchange', baseOrigin)
       );
@@ -54,40 +51,22 @@ export async function GET(request: NextRequest) {
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-    // Get user info
     const userResponse = await fetch(`${DISCORD_API_URL}/users/@me`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     if (!userResponse.ok) {
-      const errorText = await userResponse.text();
-      return NextResponse.redirect(
-        new URL('/checkout?discord_error=get_user', baseOrigin)
-      );
+      return NextResponse.redirect(new URL('/checkout?discord_error=get_user', baseOrigin));
     }
 
     const userData = await userResponse.json();
-    
-    // Use returnPath that was parsed at the beginning
     const redirectUrl = new URL(returnPath, baseOrigin);
     redirectUrl.searchParams.set('discord_id', userData.id);
-    
-    // Redirect back with Discord ID in URL
     return NextResponse.redirect(redirectUrl);
   } catch (error) {
-    console.error('❌ Discord OAuth error:', error);
-    
-    // Try to extract origin from state if available
-    const state = request.nextUrl.searchParams.get('state');
-    let baseOrigin = request.nextUrl.origin;
-    if (state && state.includes('|')) {
-      baseOrigin = state.split('|')[0];
-    } else if (state) {
-      baseOrigin = state;
-    }
-    
+    console.error('Discord OAuth error:', error);
     return NextResponse.redirect(
-      new URL('/checkout?discord_error=unknown', baseOrigin)
+      new URL('/checkout?discord_error=unknown', requestOrigin)
     );
   }
 }
@@ -96,13 +75,14 @@ export async function POST(request: NextRequest) {
   try {
     const { code } = await request.json();
 
-    if (!code) {
+    if (!code || typeof code !== 'string') {
       return NextResponse.json({ error: 'No code provided' }, { status: 400 });
     }
 
-    const redirectUri = process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI || `${request.nextUrl.origin}/api/oauth/discord/callback`;
+    const redirectUri =
+      process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI ||
+      `${request.nextUrl.origin}/api/oauth/discord/callback`;
 
-    // Exchange code for access token
     const tokenResponse = await fetch(`${DISCORD_API_URL}/oauth2/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -122,7 +102,6 @@ export async function POST(request: NextRequest) {
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-    // Get user info
     const userResponse = await fetch(`${DISCORD_API_URL}/users/@me`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });

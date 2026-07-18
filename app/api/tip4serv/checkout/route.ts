@@ -1,14 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { config } from '@/lib/config';
 import { CheckoutRequestSchema, CheckoutResponseSchema } from '@/lib/schemas';
+import { isAllowedOrigin } from '@/lib/safe-redirect';
+import { clientIp, rateLimit } from '@/lib/security';
+
+function clampRedirect(
+  value: string | undefined,
+  requestOrigin: string
+): string | undefined {
+  if (!value) return undefined;
+  try {
+    const url = new URL(value);
+    if (!isAllowedOrigin(url.origin, requestOrigin)) return undefined;
+    return url.toString();
+  } catch {
+    return undefined;
+  }
+}
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(`checkout:${clientIp(request)}`, 20, 60_000);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: 'Too many checkout attempts. Please wait a moment.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(limited.retryAfterSeconds) },
+      }
+    );
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const store = searchParams.get('store');
-    const redirect = searchParams.get('redirect') || 'true';
+    const requestOrigin = request.nextUrl.origin;
 
-    if (!store) {
+    if (!store || !/^\d+$/.test(store)) {
       return NextResponse.json(
         { error: 'Missing required parameter: store' },
         { status: 400 }
@@ -19,6 +46,18 @@ export async function POST(request: NextRequest) {
     
     // Validate request body
     const validatedBody = CheckoutRequestSchema.parse(body);
+    validatedBody.redirect_success_checkout = clampRedirect(
+      validatedBody.redirect_success_checkout,
+      requestOrigin
+    );
+    validatedBody.redirect_canceled_checkout = clampRedirect(
+      validatedBody.redirect_canceled_checkout,
+      requestOrigin
+    );
+    validatedBody.redirect_pending_checkout = clampRedirect(
+      validatedBody.redirect_pending_checkout,
+      requestOrigin
+    );
 
     const url = `${config.api.baseUrl}/store/checkout?store=${store}`;
 
